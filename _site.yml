@@ -6,6 +6,8 @@ navbar:
   - text: Slides
     href: schedule.html
   right:
+  - icon: fa-github
+    href: https://github.com/cives93/educ-640
 output:
   html_document:
     theme: journal
