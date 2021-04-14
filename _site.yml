@@ -5,7 +5,7 @@ navbar:
   left:
   - text: Slides
     href: schedule.html
-  - icon: fa-github
+  - text: Github
     href: https://github.com/cives93/educ-640
 output:
   html_document:
