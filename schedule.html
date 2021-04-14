@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Schedule</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<script src="highlight-custom.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="website-custom.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 61px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h2 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h3 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h4 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h5 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h6 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">EDLD 654</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="schedule.html">Slides, Readings, &amp; Schedule</a>
+</li>
+<li>
+  <a href="assignments.html">Assignments</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="site-syllabus.html">Syllabus</a>
+</li>
+<li>
+  <a href="https://www.kaggle.com/c/edld-654-fall-2020/overview">Kaggle</a>
+</li>
+<li>
+  <a href="talapas-pkg-install.html">
+    <span class="fa fa-server"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/uo-datasci-specialization/c4-ml-fall-2020">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Schedule</h1>
+
+</div>
+
+
+<table>
+<colgroup>
+<col width="3%" />
+<col width="4%" />
+<col width="11%" />
+<col width="25%" />
+<col width="40%" />
+<col width="4%" />
+<col width="5%" />
+<col width="4%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left"><strong>Week</strong></th>
+<th align="center"><strong>Date</strong></th>
+<th align="center"><strong>Lead Instructor</strong></th>
+<th align="center"><strong>Topic</strong></th>
+<th align="center"><strong>Functions introduced</strong></th>
+<th align="center"><strong>Assigned</strong></th>
+<th align="center"><strong>Due</strong></th>
+<th align="center"><strong>Reading</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1a</td>
+<td align="center">9/28/20</td>
+<td align="center">-</td>
+<td align="center">No Class (Yom Kippur)</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="even">
+<td align="left">1b</td>
+<td align="center">9/30/20</td>
+<td align="center">Joe</td>
+<td align="center"><a href="slides/w1p2-intro/w1p2.pdf">Intro to course</a></td>
+<td align="center"></td>
+<td align="center">Final<br/>Vote!</td>
+<td align="center"></td>
+<td align="center"><a href="https://bradleyboehmke.github.io/HOML/intro.html">HML Ch. 1</a></td>
+</tr>
+<tr class="odd">
+<td align="left">2a</td>
+<td align="center">10/5/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="slides/w2p1-inf-v-pred.html">Inference vs. Prediction<br/>Bias-Variance Tradeoff<br/>Regression vs Classification</a></td>
+<td align="center"></td>
+<td align="center"><br/>Vote!</td>
+<td align="center"></td>
+<td align="center">APM: Ch. 1, ISLR: Ch. 2.1</td>
+</tr>
+<tr class="even">
+<td align="left">2b</td>
+<td align="center">10/7/20</td>
+<td align="center">Guest Lecture: <br/><a href="https://twitter.com/stegso">Sondra Stegenga</a></td>
+<td align="center"><a href="slides/DataEthics_Fall2020.pdf">Ethics in Machine Learning</a></td>
+<td align="center"></td>
+<td align="center"><br/>Vote!</td>
+<td align="center"></td>
+<td align="center"><a href="https://royalsocietypublishing.org/doi/full/10.1098/rsta.2016.0360">Floridi &amp; Taddeo (2016)</a></td>
+</tr>
+<tr class="odd">
+<td align="left">3a</td>
+<td align="center">10/12/20</td>
+<td align="center">Joe</td>
+<td align="center"><a href="slides/w3p1-resampling/w3p1.pdf">Train and Test Splits<br/> <em>k</em>-fold CV</a></td>
+<td align="center"><code>initial_split</code><br/><code>train()</code><br/><code>test()</code><br/><code>vfold_cv()</code></td>
+<td align="center"><br/>Vote!</td>
+<td align="center"></td>
+<td align="center">ISLR: Ch. 2.2</td>
+</tr>
+<tr class="even">
+<td align="left">3b</td>
+<td align="center">10/14/20</td>
+<td align="center">Joe</td>
+<td align="center"><a href="">Lab 1: Resampling</a></td>
+<td align="center"></td>
+<td align="center"><a href="">Lab 1</a><br/>Vote!</td>
+<td align="center">Data Quiz</td>
+<td align="center">ISLR: Ch. 5.1, APM: Ch. 5, APM: Ch. 11</td>
+</tr>
+<tr class="odd">
+<td align="left">4a</td>
+<td align="center">10/19/20</td>
+<td align="center">Joe</td>
+<td align="center"><a href="slides/w4p1-penalized-regression/w4p1.pdf">Extending <code>lm</code>: Ridge, Lasso, Elastic net</a></td>
+<td align="center">Choose “model function”, <code>set_engine()</code>, <code>set_mode()</code>, <code>fit_resamples()</code></td>
+<td align="center"><br/>Vote!</td>
+<td align="center"></td>
+<td align="center">ISLR: Ch. 6.1, <a href="https://bradleyboehmke.github.io/HOML/regularized-regression.html">HML: Ch. 6</a>, APM: Ch. 6.4</td>
+</tr>
+<tr class="even">
+<td align="left">4b</td>
+<td align="center">10/21/20</td>
+<td align="center">Joe</td>
+<td align="center"><a href="">Lab 2: Penalized Regression</a></td>
+<td align="center"><code>metric_set()</code>, <code>collect_metrics()</code>, <code>select_best()</code>, <code>tune_grid()</code>, <code>grid_regular()</code>, <code>show_best()</code></td>
+<td align="center"><a href="">Lab 2</a><br/>Vote!</td>
+<td align="center">Lab 1</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">5a</td>
+<td align="center">10/26/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="slides/w5p1-feature-engineering.html">Feature engineering</a></td>
+<td align="center"><a href="https://tidymodels.github.io/recipes/">{recipes}</a></td>
+<td align="center"><br/>Vote!</td>
+<td align="center"></td>
+<td align="center"><a href="http://www.feat.engineering/intro-intro.html">FE: Ch. 1</a>, <a href="https://bradleyboehmke.github.io/HOML/engineering.html">HML: Ch. 3</a></td>
+</tr>
+<tr class="even">
+<td align="left">5b</td>
+<td align="center">10/28/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="https://www.kaggle.com/djanderson07/lab-3">Lab 3: Feature Engineering</a></td>
+<td align="center"></td>
+<td align="center"><a href="">Lab 3</a><br/>Vote!</td>
+<td align="center">Lab 2</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">6a</td>
+<td align="center">11/2/20</td>
+<td align="center">Joe</td>
+<td align="center"><a href="slides/w6p1-knn/w6p1.pdf"><em>K</em>-nearest neighbor</a></td>
+<td align="center"><code>nearest_neighbor()</code>, <code>grid_max_entropy()</code>, <code>autoplot()</code></td>
+<td align="center"><br/>Vote!</td>
+<td align="center">Prelim fit 1</td>
+<td align="center"><a href="https://bradleyboehmke.github.io/HOML/knn.html">HML: Ch. 8</a></td>
+</tr>
+<tr class="even">
+<td align="left">6b</td>
+<td align="center">11/4/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="slides/w6p2-hpc.html">Lab 4: Guided walkthrough with HPC &amp; <em>K</em>NN</a></td>
+<td align="center"></td>
+<td align="center"><a href="">Lab 4</a></td>
+<td align="center">Lab 3</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">7a</td>
+<td align="center">11/9/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="slides/w7p1-decision-trees.html">Decision trees</a></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><a href="https://bradleyboehmke.github.io/HOML/DT.html">HML: Ch. 9</a></td>
+</tr>
+<tr class="even">
+<td align="left">7b</td>
+<td align="center">11/11/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="slides/w7p2-bagging.html">Bagged trees</a></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">Lab 4</td>
+<td align="center"><a href="https://bradleyboehmke.github.io/HOML/bagging.html">HML: Ch. 10</a></td>
+</tr>
+<tr class="odd">
+<td align="left">8a</td>
+<td align="center">11/16/20</td>
+<td align="center">Joe</td>
+<td align="center"><a href="slides/w8p1-random-forest/w8p1.pdf">Random forests</a></td>
+<td align="center"><code>{workflows}</code>,<code>extract()</code></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><a href="https://bradleyboehmke.github.io/HOML/random-forest.html">HML: Ch. 11</a></td>
+</tr>
+<tr class="even">
+<td align="left">8b</td>
+<td align="center">11/18/20</td>
+<td align="center">Joe</td>
+<td align="center"><a href="">Lab 5: Tree-based models</a> &amp; <a href="slides/w8p2-review.html">Quick review</a></td>
+<td align="center"></td>
+<td align="center"><a href="">Lab 5</a></td>
+<td align="center">Prelim fit 2</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">9a</td>
+<td align="center">11/23/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="slides/w9p1-boosted-trees-1.html">Boosted Trees 1</a></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><a href="https://bradleyboehmke.github.io/HOML/gbm.html">HML Ch. 12</a></td>
+</tr>
+<tr class="even">
+<td align="left">9b</td>
+<td align="center">11/25/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="slides/w9p2-boosted-trees-2.html">Boosted Trees 2</a></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">Lab 5</td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">10a</td>
+<td align="center">11/30/20</td>
+<td align="center">-</td>
+<td align="center">Work Day</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"><a href="https://bradleyboehmke.github.io/HOML/deep-learning.html">HML Ch. 13</a>, <a href="https://bradleyboehmke.github.io/HOML/stacking.html">HML Ch. 15</a></td>
+</tr>
+<tr class="even">
+<td align="left">10b</td>
+<td align="center">12/2/20</td>
+<td align="center">Daniel</td>
+<td align="center"><a href="slides/w10p2-neural-nets.html">Intro to neural nets w/Keras &amp; Tensorflow</a></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td align="left">Finals Week</td>
+<td align="center">12/7/20</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">Final Project</td>
+<td align="center">(by 11:59 PM)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+<img alt="Creative Commons License" style="border-width:0" src="by-nc.png" width="65"/></a>
+<link rel="stylesheet" href="website-custom.css" type="text/css" />
+</p>
+<script src="highlight-custom.js"></script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
