@@ -2,4 +2,4 @@
 title: 'EDUC 640: Educational Statistics (ANOVA) in R'
 ---
 
-This repository houses all the supporting materials for the EDUC 640 course in the UO Education Program, instructed by Gina Biancarosa and Chris Ives. These materials are intended support sutdents using the free and open-source statistical programming language [R](https://cran.r-project.org).
+This website houses all the supporting materials for the EDUC 640 course in the UO Education Program, instructed by Gina Biancarosa and Chris Ives. These materials are intended support sutdents using the free and open-source statistical programming language [R](https://cran.r-project.org).
