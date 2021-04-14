@@ -1,5 +1,5 @@
 ---
-title: "ANOVA in R Cookbook"
+title: "ANOVA Weeks 1 - 3"
 author: Chris Ives
 output: 
   xaringan::moon_reader:
@@ -15,7 +15,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 needs(tidyverse, xaringan, rio, here, knitr, kableExtra, misty)
-data <- read.sav(here("Lab 2/Lab2_Vocab.sav"), use.value.labels = T)
+data <- read.sav(here("data/Lab2_Vocab.sav"), use.value.labels = T)
 ```
 
 # Contents
@@ -46,7 +46,7 @@ install.packages("needs")
 ## Importing the Data
 Normally we would use the `import()` function to import our data. However, with the SPSS `.sav` files we don't get factor labels.
 ``` {r}
-data_import <- import(here("Lab 2/Lab2_Vocab.sav"))
+data_import <- import(here("data/Lab2_Vocab.sav"))
 head(data_import)
 ```
 
@@ -58,7 +58,7 @@ For now, when working with `.sav` files we will use the `read.sav` function from
 
 ``` {r}
 needs(misty)
-l2_data <- misty::read.sav(here("Lab 2/Lab2_Vocab.sav"), 
+l2_data <- misty::read.sav(here("data/Lab2_Vocab.sav"), 
                         use.value.labels = TRUE)
 head(l2_data)
 ```
@@ -154,7 +154,7 @@ class: inverse-blue middle
 
 Example here is from Lab 1 data.
 ```{r, echo = F}
-l1_data <- misty::read.sav(here("Lab 1/Lab1_Vocab.sav"), 
+l1_data <- misty::read.sav(here("data/Lab1_Vocab.sav"), 
                         use.value.labels = TRUE)
 ```
 
@@ -238,7 +238,7 @@ class: inverse-green middle
 ---
 ## Specified Contrasts
 ``` {r, echo = F}
-l3_data <- misty::read.sav(here("Lab 3/Lab3_Vocab.sav"),
+l3_data <- misty::read.sav(here("data/Lab3_Vocab.sav"),
                         use.value.labels = TRUE)
 ```
 
