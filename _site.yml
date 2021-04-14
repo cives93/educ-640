@@ -9,7 +9,6 @@ navbar:
 output:
   html_document:
     theme: journal
-    css: website-custom.css
     includes:
       in_header: header.html
       after_body: footer.html
