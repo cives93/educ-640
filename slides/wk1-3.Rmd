@@ -286,7 +286,6 @@ mat
 * contrast2 = social science vs history
 
 ``` {r}
-needs(effectsize)
 m_contrasts <- lm(vocab ~ instruct, data=l3_data, contrasts = list(instruct = mat))
 summary(m_contrasts)
 ```

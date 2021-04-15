@@ -399,7 +399,6 @@ mat
 
 
 ```r
-needs(effectsize)
 m_contrasts &lt;- lm(vocab ~ instruct, data=l3_data, contrasts = list(instruct = mat))
 summary(m_contrasts)
 ```
