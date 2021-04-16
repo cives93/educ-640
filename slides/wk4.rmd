@@ -1,0 +1,299 @@
+---
+title: "ANOVA Week 4 - Two-Way ANOVA"
+author: Chris Ives
+output: 
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+needs(tidyverse, xaringan, rio, here, knitr, kableExtra, misty)
+data <- read.sav(here("data/Lab4_Vocab.sav"), use.value.labels = T)
+```
+
+# Contents
+
+* Foundations
+  + Crosstabs
+  + Clustered Boxplots
+  + Plots
+
+* ANOVA
+  + One-way ANOVA
+  + Pairwise Comparisons
+  + Planned Contrasts
+  + Power Analysis
+
+---
+## Data exploration
+
+We are interested on the relationship of lecture topic and method with vocabulary learning. Let's check the levels of our IVs (`data$meth` = lecture method, `data$inst` = lecture topic).
+
+```{r, eval = FALSE}
+levels(data$meth)
+levels(data$inst)
+```
+
+---
+## Crosstabs
+
+``` {r}
+data %>% 
+  group_by(inst, meth) %>% 
+  summarise(n = n()) %>% 
+  spread(meth, n)
+```
+
+Notice how we have 1s down the instruct column.
+
+---
+## The Fix
+For now, when working with `.sav` files we will use the `read.sav` function from the `misty` package. `use.value.labels = TRUE` tells it to use the labels as the cell values.
+
+``` {r}
+needs(misty)
+l2_data <- misty::read.sav(here("data/Lab2_Vocab.sav"), 
+                        use.value.labels = TRUE)
+head(l2_data)
+```
+
+---
+## Checking The Assumptions of ANOVA
+
+- Independence of observations
+- Normality
+- Homogeneity of variance
+
+---
+## Descriptive Statistics
+
+Make sure the `psych` package is installed and loaded:
+```{r, echo = TRUE}
+needs(psych)
+```
+
+`describe` from the `psych` package is one of the more popular functions for descriptive statistics.
+
+```{r, echo = TRUE, eval = FALSE}
+describe(l2_data)
+```
+
+```{r echo = FALSE, eval = TRUE}
+d <- describe(l2_data)
+rmarkdown::paged_table(d)
+```
+
+---
+## Independence of Observations
+ - Do participants cross groups?
+ - We know this if we know the study design
+ - In this study, each student experienced one and only one lecture
+
+---
+## Normality
+- We can check the skew and kurtosis values from our `describe()` output.
+- 0 ± 2 is a good rule of thumb for a tenable assumption of normality.
+
+```{r echo = FALSE, eval = TRUE}
+d <- as.data.frame(d) %>% 
+  select(vars, n, skew, kurtosis)
+rmarkdown::paged_table(d)
+```
+
+- Instruct is a categorical variable, so we can ignore the skew and kurtosis on that. 
+
+---
+## Visual Inspection for Normality
+- For the most part, plots will be wrapped using the `ggplot()` function.
+
+### Histogram
+```{r, echo = TRUE, eval = FALSE}
+ggplot(data = l2_data, aes(x = vocab)) +
+  geom_histogram()
+```
+
+- `aes()` refers to aesthetics. What are the variables we want represented in our plots? Since we just want counts of a single continuous variable, we just need to specify our `x` (i.e., `x = vocab`).
+
+---
+## Histograms
+```{r, echo = TRUE, eval = TRUE, message = F, fig.width = 8, fig.height= 6, fig.align='center'}
+ggplot(data = l2_data, aes(x = vocab)) +
+  geom_histogram()
+```
+
+---
+## Boxplot
+- To get boxplots, we just substitute `geom_histogram()` for `geom_boxplot()` and modify our aesthetics.
+
+```{r, echo = TRUE, fig.width = 6, fig.height= 4, fig.align='center'}
+ggplot(data = l2_data, aes(x = instruct, y = vocab)) +
+  geom_boxplot()
+```
+
+---
+## Homogeneity of Variance
+Homogeneity test is a separate analysis. We'll just use the `leveneTest` function for the `car` package. Formula is the same as for the ANOVA we want to run. Specify `center = "mean"` (function's default is median) to match SPSS results.
+
+``` {r}
+needs(car)
+car::leveneTest(vocab ~ instruct, data = l2_data, center = "mean")
+```
+
+Our significant result shows error variance around the *mean* is not equal across groups.
+---
+class: inverse-blue middle
+# Running ANOVAs
+
+---
+
+Example here is from Lab 1 data.
+```{r, echo = F}
+l1_data <- misty::read.sav(here("data/Lab1_Vocab.sav"), 
+                        use.value.labels = TRUE)
+```
+
+ANOVAs will be run using the `anova_test()` function. Formula is specified as `DV ~ IV`. My convention is to number my model objects (e.g., m1, m2, etc.)
+
+```{r, messages = FALSE}
+needs(rstatix)
+m1 <- anova_test(data = l1_data, formula = vocab ~ instruct, detailed = TRUE)
+m1
+
+```
+
+---
+## Effect Sizes
+Effect sizes can be specified using `effect.size = ____` in the `anova.test()` function. Use `effect.size = "ges"` for generalized eta squared or `effect.size = "pes"` for partial eta squared. Default is "`ges"`.
+
+```{r, messages = FALSE, eval = F}
+anova_test(data = l1_data, formula = vocab ~ instruct,
+           effect.size = "ges")
+```
+
+---
+
+```{r, messages = FALSE, eval = T}
+anova_test(data = l1_data, formula = vocab ~ instruct,
+           effect.size = "ges")
+```
+
+```{r}
+anova_test(data = l1_data, formula = vocab ~ instruct,
+           effect.size = "pes")
+```
+
+Notice they are the same for a one-way between subjects ANOVA.
+---
+## Posthoc Comparisons | Tukey
+If you write out `"data = l2data"` the function will produce an error since it designed for multiple types of objects. Here we just type "l2data".
+```{r, eval = F}
+rstatix::tukey_hsd(l2_data, formula = vocab ~ instruct)
+```
+
+```{r, echo = F}
+tukey <- rstatix::tukey_hsd(l2_data, formula = vocab ~ instruct)
+rmarkdown::paged_table(tukey)
+```
+
+---
+## Posthoc Comparisons | Games-Howell
+Remember, Games-Howell is used if the assumption of variance homogeneity is violated.
+```{r, eval = F}
+rstatix::games_howell_test(vocab ~ instruct, data = l2_data, 
+                           conf.level = 0.95, 
+                           detailed = FALSE)
+```
+
+```{r, echo = F}
+gh <- rstatix::games_howell_test(vocab ~ instruct, data = l2_data, 
+                                 conf.level = 0.95, 
+                                 detailed = FALSE)
+rmarkdown::paged_table(gh)
+```
+
+---
+## Posthoc Comparisons | Bonferroni
+``` {r, eval = F}
+pairwise_t_test(data = l2_data, vocab ~ instruct, 
+                p.adjust.method = "bonferroni")
+```
+
+``` {r, echo = FALSE}
+bf <- pairwise_t_test(data = l2_data, vocab ~ instruct, 
+                p.adjust.method = "bonferroni")
+
+rmarkdown::paged_table(bf)
+```
+
+---
+class: inverse-green middle
+# Specified Contrasts
+* They are not automatic in R and are a bit difficult. It is not important that you understand the reasoning behind all of the following steps.
+---
+## Specified Contrasts
+``` {r, echo = F}
+l3_data <- misty::read.sav(here("data/Lab3_Vocab.sav"),
+                        use.value.labels = TRUE)
+```
+
+Check the order of your levels.
+```{r}
+levels(l3_data$instruct)
+```
+
+Make sure they are in the order that you would like and code your contrasts accordingly. As an example, If they need to be reordered use:
+``` {r}
+l3_data$instruct <- factor(l3_data$instruct, levels = c("social science", "history", "physical science"))
+```
+Note: We will be using the original order in the following contrasts.
+
+``` {r, echo = F}
+l3_data$instruct <- factor(l3_data$instruct, levels = c("physical science", "social science", "history"))
+
+```
+
+---
+**Step 1**: Set your contrasts. We'll do Helmert here.
+``` {r, eval = T}
+contrast1 <- c(1, -.5, -.5) # physical science vs others
+contrast2 <- c(0, 1, -1) #social science vs history
+```
+
+**Step 2**: Bind the vectors into a temporary matrix. Constant should be equal to 1/(length of your vectors).
+```{r}
+mat.temp <- rbind(constant=1/3, contrast1, contrast2)
+mat.temp
+```
+
+---
+**Step 3**: Take the inverse of the matrix using the `solve()` function. Then we are dropping the first column with the constants.
+```{r}
+mat <- solve(mat.temp)
+mat
+mat<- mat[ , -1]
+mat
+```
+
+---
+**Step 4**: Run your model formula using `lm()` and set contrasts. Here we are linking our "instruct" variable with our contrast matrix. Remember:
+* contrast1 = physical science vs others
+* contrast2 = social science vs history
+
+``` {r}
+m_contrasts <- lm(vocab ~ instruct, data=l3_data, contrasts = list(instruct = mat))
+summary(m_contrasts)
+```
+
+---
+## How do I get the SDs for calculating effect sizes?
+
+We will use the `mutate` function to code new groupings. Then, we will run descriptives on this variable. My `case_when` function reads: If `instruct` = `social science` or `instruct` = `history`, code contrast1 as `humanities`. If `instruct` = `physical science` code as `physical science`.
+
+
