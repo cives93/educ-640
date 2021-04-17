@@ -44,7 +44,7 @@ For the sake of table formatting, I'll keep mine on for the slides.
 ---
 ## Crosstabs
 
-The following code shows how to make crosstabs using `dplyr` functions. I find myself using `group_by` and `summarise` all the time, so I'd suggest running these lines one by one so you can get a sense of what they're doing. `summarise` creates a row for each group we've specified, then we specify the column contents.
+The following code shows how to make crosstabs using `dplyr` functions. `group_by` and `summarise` are good to know, so I'd suggest running these lines one by one so you can get a sense of what they're doing. `summarise` creates a row for each group we've specified, then we specify the column contents.
 ``` {r, messages = F}
 data %>% 
   group_by(inst, meth) %>% 
