@@ -167,7 +167,7 @@ data %>%
 ---
 ## Interaction Plots
 
-This the most straightforward way to produce an interaction plot. For those interested, I'll add a slide on how to extract means for use in `ggplot` next week.
+This the most straightforward way to produce an interaction plot. For those interested, I'll add a slide on how to extract means for use in `ggplot` by early next week.
 ```{r, fig.width= 6, fig.height=4, fig.align='center'}
 with(data, {
 interaction.plot(x.factor = inst,
