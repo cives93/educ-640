@@ -97,7 +97,8 @@ needs(rstatix, emmeans)
 ## Two-Way ANOVA
 For a two-way ANOVA we just add our additional IV to the right-side of the formula. We specify the interaction using `inst*meth`.
 ```{r, messages = FALSE}
-m1 <- anova_test(data, formula = vocab ~ inst + meth + inst*meth, detailed = TRUE, type = 3, effect.size = "pes")
+m1 <- anova_test(data, formula = vocab ~ inst + meth + inst*meth, 
+                 detailed = TRUE, type = 3, effect.size = "pes")
 m1
 
 
@@ -107,6 +108,7 @@ m1
 ## Levene's Test
 ```{r}
 car::leveneTest(vocab ~ inst*meth, data = data, center = "mean")
+
 ```
 
 ---
