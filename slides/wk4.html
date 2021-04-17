@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>EDUC 640</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Chris Ives" />
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+    <script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# EDUC 640
+## Two-Way ANOVA
+### Chris Ives
+
+---
+
+
+
+
+# Contents
+
+* Foundations
+  + Crosstabs
+  + Clustered Boxplots
+
+* ANOVA
+  + Two-way ANOVA
+  + Marginal Means
+  + Simple Effects
+  + Interaction Plots
+
+---
+
+## PSA - Scientific Notation
+
+Sometimes I find scientific notation to be a bit annoying to work with in R. If you want to turn it off for your session run the following code:
+
+```r
+options(scipen = 999)
+```
+
+For the sake of table formatting, I'll keep mine on for the slides.
+---
+## Crosstabs
+
+The following code shows how to make crosstabs using `dplyr` functions. I find myself using `group_by` and `summarise` all the time, so I'd suggest running these lines one by one so you can get a sense of what they're doing. `summarise` creates a row for each group we've specified, then we specify the column contents.
+
+```r
+data %&gt;% 
+  group_by(inst, meth) %&gt;% 
+  summarise(n = n()) %&gt;% #new column "n" = row count of each factor grouping
+  spread(meth, n) 
+```
+
+```
+## `summarise()` regrouping output by 'inst' (override with `.groups` argument)
+```
+
+```
+## # A tibble: 3 x 3
+## # Groups:   inst [3]
+##   inst             computer standard
+##   &lt;fct&gt;               &lt;int&gt;    &lt;int&gt;
+## 1 physical science        6        6
+## 2 social science          6        6
+## 3 history                 6        6
+```
+
+---
+## Check Descriptives
+
+
+```r
+rmarkdown::paged_table(
+  describe(data)
+  )
+```
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["vars"],"name":[1],"type":["int"],"align":["right"]},{"label":["n"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["mean"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["median"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["trimmed"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["mad"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["min"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["max"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["range"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["skew"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["kurtosis"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[13],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"36","3":"18.5","4":"10.5356538","5":"18.5","6":"18.5","7":"13.3434","8":"1","9":"36","10":"35","11":"0.0000000","12":"-1.3003629","13":"1.75594229","_rn_":"idnum"},{"1":"2","2":"36","3":"33.5","4":"12.8652355","5":"35.5","6":"34.2","7":"12.6021","8":"6","9":"53","10":"47","11":"-0.5359932","12":"-0.8726857","13":"2.14420592","_rn_":"vocab"},{"1":"3","2":"36","3":"2.0","4":"0.8280787","5":"2.0","6":"2.0","7":"1.4826","8":"1","9":"3","10":"2","11":"0.0000000","12":"-1.5821759","13":"0.13801311","_rn_":"inst*"},{"1":"4","2":"36","3":"1.5","4":"0.5070926","5":"1.5","6":"1.5","7":"0.7413","8":"1","9":"2","10":"1","11":"0.0000000","12":"-2.0547840","13":"0.08451543","_rn_":"meth*"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+---
+## Separate Boxplots
+
+Since we already covered normal boxplots, I'll just demonstrate a way to plot multiple boxplots if the need every arises. You'll need the `gridExtra` package.
+
+```r
+inst_plot &lt;- ggplot(data, aes(x = inst, y = vocab)) +
+  geom_boxplot()
+meth_plot &lt;- ggplot(data, aes(x = meth, y = vocab)) +
+  geom_boxplot()
+gridExtra::grid.arrange(inst_plot, meth_plot, nrow = 1) ## nrow = 1 so they are arranged side by side
+```
+
+![](wk4_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+---
+## Clustered Boxplots
+Same process but you'll need to specify the other IV using `color =`, or `fill =`.
+
+```r
+inst_color &lt;- ggplot(data, aes(x = inst, y = vocab, color = meth)) +
+  geom_boxplot()
+meth_fill &lt;- ggplot(data, aes(x = meth, y = vocab, fill = inst)) +
+  geom_boxplot()
+gridExtra::grid.arrange(inst_color, meth_fill, nrow = 1)
+```
+
+![](wk4_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+class: inverse-blue middle
+# Two-Way ANOVA
+
+
+```r
+needs(rstatix, emmeans)
+```
+---
+
+## Two-Way ANOVA
+For a two-way ANOVA we just add our additional IV to the right-side of the formula. We specify the interaction using `inst*meth`.
+
+```r
+m1 &lt;- anova_test(data, formula = vocab ~ inst + meth + inst*meth, detailed = TRUE, type = 3, effect.size = "pes")
+```
+
+```
+## Coefficient covariances computed by hccm()
+```
+
+```r
+m1
+```
+
+```
+## ANOVA Table (type III tests)
+## 
+##        Effect   SSn  SSd DFn DFd       F        p p&lt;.05   pes
+## 1 (Intercept) 40401 1668   1  30 726.637 1.39e-22     * 0.960
+## 2        inst  1194 1668   2  30  10.737 3.04e-04     * 0.417
+## 3        meth  2209 1668   1  30  39.730 5.99e-07     * 0.570
+## 4   inst:meth   722 1668   2  30   6.493 5.00e-03     * 0.302
+```
+---
+
+## Levene's Test
+
+```r
+car::leveneTest(vocab ~ inst*meth, data = data, center = "mean")
+```
+
+```
+## Levene's Test for Homogeneity of Variance (center = "mean")
+##       Df F value  Pr(&gt;F)  
+## group  5  2.0579 0.09877 .
+##       30                  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+## Marginal Means
+
+To get estimated marginal means for an interaction, we need to group by one of the IVs and then run our `emmeans_test` with the other. This just gives us the mean differences and significance tests.
+
+
+```r
+means &lt;- data %&gt;%
+  group_by(meth) %&gt;% 
+ emmeans_test(vocab ~ inst, p.adjust.method = "holm", detailed = TRUE)
+paged_table(means)
+```
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["meth"],"name":[1],"type":["chr"],"align":["left"]},{"label":["term"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".y."],"name":[3],"type":["chr"],"align":["left"]},{"label":["group1"],"name":[4],"type":["chr"],"align":["left"]},{"label":["group2"],"name":[5],"type":["chr"],"align":["left"]},{"label":["null.value"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["estimate"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["conf.low"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["conf.high"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["p"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["p.adj"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["p.adj.signif"],"name":[15],"type":["chr"],"align":["left"]}],"data":[{"1":"computer","2":"inst","3":"vocab","4":"physical science","5":"social science","6":"0","7":"6","8":"4.305036","9":"30","10":"-2.7920561","11":"14.79206","12":"1.3937166","13":"1.736427e-01","14":"3.472853e-01","15":"ns","_rn_":"1"},{"1":"computer","2":"inst","3":"vocab","4":"physical science","5":"history","6":"0","7":"8","8":"4.305036","9":"30","10":"-0.7920561","11":"16.79206","12":"1.8582888","13":"7.296550e-02","14":"2.188965e-01","15":"ns","_rn_":"2"},{"1":"computer","2":"inst","3":"vocab","4":"social science","5":"history","6":"0","7":"2","8":"4.305036","9":"30","10":"-6.7920561","11":"10.79206","12":"0.4645722","13":"6.455920e-01","14":"6.455920e-01","15":"ns","_rn_":"3"},{"1":"standard","2":"inst","3":"vocab","4":"physical science","5":"social science","6":"0","7":"22","8":"4.305036","9":"30","10":"13.2079439","11":"30.79206","12":"5.1102943","13":"1.706157e-05","14":"5.118471e-05","15":"****","_rn_":"4"},{"1":"standard","2":"inst","3":"vocab","4":"physical science","5":"history","6":"0","7":"3","8":"4.305036","9":"30","10":"-5.7920561","11":"11.79206","12":"0.6968583","13":"4.912565e-01","14":"4.912565e-01","15":"ns","_rn_":"5"},{"1":"standard","2":"inst","3":"vocab","4":"social science","5":"history","6":"0","7":"-19","8":"4.305036","9":"30","10":"-27.7920561","11":"-10.20794","12":"-4.4134360","13":"1.212903e-04","14":"2.425807e-04","15":"***","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+---
+## Marginal Means
+
+To get the actual marginal means, we just run `get_emmeans()` on our `means` object.
+
+
+```r
+paged_table(
+  get_emmeans(means)
+)
+```
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":["meth"],"name":[1],"type":["fct"],"align":["left"]},{"label":["inst"],"name":[2],"type":["fct"],"align":["left"]},{"label":["emmean"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["conf.low"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["conf.high"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["method"],"name":[8],"type":["chr"],"align":["left"]}],"data":[{"1":"computer","2":"physical science","3":"46","4":"3.04412","5":"30","6":"39.783078","7":"52.21692","8":"Emmeans test"},{"1":"computer","2":"social science","3":"40","4":"3.04412","5":"30","6":"33.783078","7":"46.21692","8":"Emmeans test"},{"1":"computer","2":"history","3":"38","4":"3.04412","5":"30","6":"31.783078","7":"44.21692","8":"Emmeans test"},{"1":"standard","2":"physical science","3":"34","4":"3.04412","5":"30","6":"27.783078","7":"40.21692","8":"Emmeans test"},{"1":"standard","2":"social science","3":"12","4":"3.04412","5":"30","6":"5.783078","7":"18.21692","8":"Emmeans test"},{"1":"standard","2":"history","3":"31","4":"3.04412","5":"30","6":"24.783078","7":"37.21692","8":"Emmeans test"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+
+---
+## Univariate Comparisons
+
+Since we have an interaction, we are going to check the significance of method (`meth`) on each level of instruction (`inst`). We are telling it to use SS and df from our full model with `error = model`.
+
+```r
+model &lt;- lm(vocab ~ inst*meth, data = data)
+
+data %&gt;%
+  group_by(inst) %&gt;%
+  anova_test(vocab ~ meth, error = model)
+```
+
+
+```
+## Coefficient covariances computed by hccm()
+## Coefficient covariances computed by hccm()
+## Coefficient covariances computed by hccm()
+```
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":["inst"],"name":[1],"type":["fct"],"align":["left"]},{"label":["Effect"],"name":[2],"type":["chr"],"align":["left"]},{"label":["DFn"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["DFd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["p"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["p&lt;.05"],"name":[7],"type":["chr"],"align":["left"]},{"label":["ges"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"physical science","2":"meth","3":"1","4":"30","5":"7.770","6":"9.00e-03","7":"*","8":"0.206"},{"1":"social science","2":"meth","3":"1","4":"30","5":"42.302","6":"3.44e-07","7":"*","8":"0.585"},{"1":"history","2":"meth","3":"1","4":"30","5":"2.644","6":"1.14e-01","7":"","8":"0.081"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+---
+## Univariate Comparisons
+
+We can instead test the effect of *instruction* on each level of *method* by switching the two IVs.
+
+
+```r
+data %&gt;%
+  group_by(meth) %&gt;%
+  anova_test(vocab ~ inst, error = model)
+```
+
+```
+## Coefficient covariances computed by hccm()
+## Coefficient covariances computed by hccm()
+```
+
+```
+## # A tibble: 2 x 8
+##   meth     Effect   DFn   DFd     F         p `p&lt;.05`   ges
+##   &lt;fct&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;
+## 1 computer inst       2    30  1.87 0.172     ""      0.111
+## 2 standard inst       2    30 15.4  0.0000255 "*"     0.506
+```
+---
+## Interaction Plots
+
+This the most straightforward way to produce an interaction plot. For those interested, I'll add a slide on how to extract means for use in `ggplot` next week.
+
+```r
+with(data, {
+interaction.plot(x.factor = inst,
+                 trace.factor = meth,
+                 response = vocab,
+                 type = "l")
+})
+```
+
+&lt;img src="wk4_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
