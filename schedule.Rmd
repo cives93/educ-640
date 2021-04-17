@@ -4,7 +4,7 @@ title: "Schedule"
 
 | **Week(s)** |  **Date**           |           **Topic**                                                |                          **Functions introduced**                                               |
 | :-------:   | :-----------------: | :----------------------------------------------------------------: | :----------------------------------------------------------------------------------------------: | 
-| 1 - 3       |  4/12        | [Foundations, One-Way Anova, & Contrasts](slides/wk1-3.html)       | `leveneTest`, `anova_test`, `tukey_hsd`, `games_howell_test`                                         |
-| 4           | 4/16        | [Two-Way Between-Subjects ANOVA](slides/wk4.html)                   |   `emmeans_test`, `get_emmeans`, `interaction_plot`                                                |
-| 5 - 6       | 4/23         | Within-subjects ANOVA (One-way and Two-way)                        |                                                                                                    |
-| 7 - 8       | 5/8         | Mixed ANOVA                                                        |                                                                                                        
+| 1 - 3       |  4/12                | [Foundations, One-Way Anova, & Contrasts](slides/wk1-3.html)       | `leveneTest`, `anova_test`, `tukey_hsd`, `games_howell_test`                                     |
+| 4           | 4/16                | [Two-Way Between-Subjects ANOVA](slides/wk4.html)                   |   `emmeans_test`, `get_emmeans`, `interaction_plot`                                               |
+| 5 - 6       | 4/23                | Within-subjects ANOVA (One-way and Two-way)                        |                                                                                                    |
+| 7 - 8       | 5/8                    | Mixed ANOVA                                                      |                                                                                                   |                                                                                               
