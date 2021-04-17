@@ -130,7 +130,8 @@ needs(rstatix, emmeans)
 For a two-way ANOVA we just add our additional IV to the right-side of the formula. We specify the interaction using `inst*meth`.
 
 ```r
-m1 &lt;- anova_test(data, formula = vocab ~ inst + meth + inst*meth, detailed = TRUE, type = 3, effect.size = "pes")
+m1 &lt;- anova_test(data, formula = vocab ~ inst + meth + inst*meth, 
+                 detailed = TRUE, type = 3, effect.size = "pes")
 ```
 
 ```
@@ -267,7 +268,10 @@ interaction.plot(x.factor = inst,
 ```
 
 &lt;img src="wk4_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+---
 
+## Final Notes
+The tough thing about running this in R is having to ask for everything and then having lots of separate output to review. For now it'll be good to know how to ask for something specific and not rely on something too automated. However, I'll look into finding or writing some custom functions that help tidy up all this output.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

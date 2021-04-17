@@ -176,4 +176,7 @@ interaction.plot(x.factor = inst,
                  type = "l")
 })
 ```
+---
 
+## Final Notes
+The tough thing about running this in R is having to ask for everything and then having lots of separate output to review. For now it'll be good to know how to ask for something specific and not rely on something too automated. However, I'll look into finding or writing some custom functions that help tidy up all this output.
