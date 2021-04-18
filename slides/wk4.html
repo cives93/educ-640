@@ -59,7 +59,7 @@ data %&gt;%
 ```
 
 ```
-## `summarise()` regrouping output by 'inst' (override with `.groups` argument)
+## `summarise()` has grouped output by 'inst'. You can override using the `.groups` argument.
 ```
 
 ```
@@ -130,7 +130,7 @@ needs(rstatix, emmeans)
 For a two-way ANOVA we just add our additional IV to the right-side of the formula. We specify the interaction using `inst*meth`.
 
 ```r
-m1 &lt;- anova_test(data, formula = vocab ~ inst + meth + inst*meth, 
+m1 &lt;- anova_test(data, formula = vocab ~ inst + meth + inst:meth, 
                  detailed = TRUE, type = 3, effect.size = "pes")
 ```
 
@@ -210,7 +210,7 @@ paged_table(
 Since we have an interaction, we are going to check the significance of method (`meth`) on each level of instruction (`inst`). We are telling it to use SS and df from our full model with `error = model`.
 
 ```r
-model &lt;- lm(vocab ~ inst*meth, data = data)
+model &lt;- lm(vocab ~ inst + meth + inst:meth, data = data)
 
 data %&gt;%
   group_by(inst) %&gt;%
@@ -226,7 +226,7 @@ data %&gt;%
 
 &lt;div data-pagedtable="false"&gt;
   &lt;script data-pagedtable-source type="application/json"&gt;
-{"columns":[{"label":["inst"],"name":[1],"type":["fct"],"align":["left"]},{"label":["Effect"],"name":[2],"type":["chr"],"align":["left"]},{"label":["DFn"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["DFd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["p"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["p&lt;.05"],"name":[7],"type":["chr"],"align":["left"]},{"label":["ges"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"physical science","2":"meth","3":"1","4":"30","5":"7.770","6":"9.00e-03","7":"*","8":"0.206"},{"1":"social science","2":"meth","3":"1","4":"30","5":"42.302","6":"3.44e-07","7":"*","8":"0.585"},{"1":"history","2":"meth","3":"1","4":"30","5":"2.644","6":"1.14e-01","7":"","8":"0.081"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["inst"],"name":[1],"type":["fct"],"align":["left"]},{"label":["Effect"],"name":[2],"type":["chr"],"align":["left"]},{"label":["DFn"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["DFd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["F"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["p"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["p&lt;.05"],"name":[7],"type":["chr"],"align":["left"]},{"label":["ges"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"physical science","2":"meth","3":"1","4":"30","5":"7.770","6":"9.00e-03","7":"*","8":"0.206","_rn_":"1"},{"1":"social science","2":"meth","3":"1","4":"30","5":"42.302","6":"3.44e-07","7":"*","8":"0.585","_rn_":"2"},{"1":"history","2":"meth","3":"1","4":"30","5":"2.644","6":"1.14e-01","7":"","8":"0.081","_rn_":"3"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   &lt;/script&gt;
 &lt;/div&gt;
 ---
@@ -249,7 +249,7 @@ data %&gt;%
 ```
 ## # A tibble: 2 x 8
 ##   meth     Effect   DFn   DFd     F         p `p&lt;.05`   ges
-##   &lt;fct&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;
+## * &lt;fct&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;
 ## 1 computer inst       2    30  1.87 0.172     ""      0.111
 ## 2 standard inst       2    30 15.4  0.0000255 "*"     0.506
 ```

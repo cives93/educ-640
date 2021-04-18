@@ -97,7 +97,7 @@ needs(rstatix, emmeans)
 ## Two-Way ANOVA
 For a two-way ANOVA we just add our additional IV to the right-side of the formula. We specify the interaction using `inst*meth`.
 ```{r, messages = FALSE}
-m1 <- anova_test(data, formula = vocab ~ inst + meth + inst*meth, 
+m1 <- anova_test(data, formula = vocab ~ inst + meth + inst:meth, 
                  detailed = TRUE, type = 3, effect.size = "pes")
 m1
 
@@ -139,7 +139,7 @@ paged_table(
 
 Since we have an interaction, we are going to check the significance of method (`meth`) on each level of instruction (`inst`). We are telling it to use SS and df from our full model with `error = model`.
 ``` {r eval = F}
-model <- lm(vocab ~ inst*meth, data = data)
+model <- lm(vocab ~ inst + meth + inst:meth, data = data)
 
 data %>%
   group_by(inst) %>%
@@ -147,7 +147,7 @@ data %>%
 ```
 
 ``` {r eval = T, echo = F}
-model <- lm(vocab ~ inst*meth, data = data)
+model <- lm(vocab ~ inst + meth + inst:meth, data = data)
 
 paged_table(data %>%
   group_by(inst) %>%
