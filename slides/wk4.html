@@ -28,6 +28,8 @@ class: center, middle, inverse, title-slide
 * Foundations
   + Crosstabs
   + Clustered Boxplots
+  
+  
 
 * ANOVA
   + Two-way ANOVA
@@ -88,6 +90,25 @@ rmarkdown::paged_table(
   &lt;/script&gt;
 &lt;/div&gt;
 ---
+
+## Grouped Descriptives
+
+Setting `mat = TRUE` gives you the output for each level in one data frame.
+
+```r
+rmarkdown::paged_table(
+  describeBy(x = data$vocab, group = data$inst, 
+             mat = TRUE, data = data)
+  )
+```
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["item"],"name":[1],"type":["chr"],"align":["left"]},{"label":["group1"],"name":[2],"type":["chr"],"align":["left"]},{"label":["vars"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["n"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["mean"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["median"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["trimmed"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["mad"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["min"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["max"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["range"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["skew"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["kurtosis"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[15],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"physical science","3":"1","4":"12","5":"40.0","6":"10.795622","7":"43.0","8":"40.9","9":"11.8608","10":"18","11":"53","12":"35","13":"-0.56390947","14":"-1.003818","15":"3.116428","_rn_":"X11"},{"1":"2","2":"social science","3":"1","4":"12","5":"26.0","6":"15.201675","7":"24.5","8":"25.9","9":"20.7564","10":"6","11":"47","12":"41","13":"0.03928301","14":"-1.914109","15":"4.388345","_rn_":"X12"},{"1":"3","2":"history","3":"1","4":"12","5":"34.5","6":"8.393721","7":"35.5","8":"34.8","9":"8.1543","10":"20","11":"46","12":"26","13":"-0.36694097","14":"-1.132315","15":"2.423058","_rn_":"X13"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+
+---
 ## Separate Boxplots
 
 Since we already covered normal boxplots, I'll just demonstrate a way to plot multiple boxplots if the need every arises. You'll need the `gridExtra` package.
@@ -100,7 +121,7 @@ meth_plot &lt;- ggplot(data, aes(x = meth, y = vocab)) +
 gridExtra::grid.arrange(inst_plot, meth_plot, nrow = 1) ## nrow = 1 so they are arranged side by side
 ```
 
-![](wk4_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+![](wk4_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
 
 ---
 ## Clustered Boxplots
@@ -114,7 +135,7 @@ meth_fill &lt;- ggplot(data, aes(x = meth, y = vocab, fill = inst)) +
 gridExtra::grid.arrange(inst_color, meth_fill, nrow = 1)
 ```
 
-![](wk4_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+![](wk4_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
 
 ---
 class: inverse-blue middle
@@ -151,8 +172,8 @@ m1
 ## 3        meth  2209 1668   1  30  39.730 5.99e-07     * 0.570
 ## 4   inst:meth   722 1668   2  30   6.493 5.00e-03     * 0.302
 ```
----
 
+---
 ## Levene's Test
 
 ```r
@@ -267,7 +288,7 @@ interaction.plot(x.factor = inst,
 })
 ```
 
-&lt;img src="wk4_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="wk4_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
 ---
 
 ## Final Notes

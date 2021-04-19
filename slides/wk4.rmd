@@ -24,6 +24,8 @@ data <- read.sav(here("data/Lab4_Vocab.sav"), use.value.labels = T)
 * Foundations
   + Crosstabs
   + Clustered Boxplots
+  
+  
 
 * ANOVA
   + Two-way ANOVA
@@ -59,7 +61,20 @@ data %>%
 rmarkdown::paged_table(
   describe(data)
   )
+
 ```
+---
+
+## Grouped Descriptives
+
+Setting `mat = TRUE` gives you the output for each level in one data frame.
+```{r}
+rmarkdown::paged_table(
+  describeBy(x = data$vocab, group = data$inst, 
+             mat = TRUE, data = data)
+  )
+```
+
 ---
 ## Separate Boxplots
 
@@ -103,8 +118,8 @@ m1
 
 
 ```
----
 
+---
 ## Levene's Test
 ```{r}
 car::leveneTest(vocab ~ inst*meth, data = data, center = "mean")
