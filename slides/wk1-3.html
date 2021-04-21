@@ -34,6 +34,8 @@ class: center, middle, inverse, title-slide
   + Pairwise Comparisons
   + Planned Contrasts
   + Power Analysis
+* Appendix
+  + Custom Contrast Sets
 
 ---
 ## Installing the `needs` Package
@@ -570,6 +572,77 @@ contrast_anova
 ##        Effect   SSn  SSd DFn DFd       F        p p&lt;.05   ges
 ## 1 (Intercept) 40401 4599   1  33 289.896 6.57e-18     * 0.898
 ## 2    instruct  1194 4599   2  33   4.284 2.20e-02     * 0.206
+```
+---
+class: inverse-red middle
+# Appendix
+
+---
+
+## Contrasts
+
+**Isolated vs. Orthogonal Sets**.
+If you are conducting an isolated contrast, or non-orthagonal set, you will need to use a different process for specifying contrasts. Here I demonstrate doing a single contrast. The primary difference is using `ginv()` from the `MASS` package rather than `solve()`.
+
+
+```r
+contrast0 &lt;- c(1, -.5, -.5) 
+mat.temp &lt;- rbind(constant = 1/2, contrast0)
+mat.temp
+```
+
+```
+##           [,1] [,2] [,3]
+## constant   0.5  0.5  0.5
+## contrast0  1.0 -0.5 -0.5
+```
+
+```r
+mat &lt;- MASS::ginv(mat.temp)
+mat &lt;- mat[ , -1]
+mat
+```
+
+```
+## [1]  0.6666667 -0.3333333 -0.3333333
+```
+
+---
+
+Essentially, R fills in the rest of the matrix. This means that there will be "extra" contrasts in the output that you will need to ignore. Here `instruct1` corresponds to my first and only contrast. `instruct2` can be ignored. 
+
+```r
+m_contrasts &lt;- lm(vocab ~ instruct, data=l3_data, contrasts = list(instruct = mat))
+m_contrasts
+```
+
+```
+## 
+## Call:
+## lm(formula = vocab ~ instruct, data = l3_data, contrasts = list(instruct = mat))
+## 
+## Coefficients:
+## (Intercept)    instruct1    instruct2  
+##       33.50         9.75         6.01
+```
+---
+
+If you want to make it easier to refer back to your contrasts, you can rename them in your output using the following code. Here I chose to keep the name of the intercept, name my contrast, and make everything else unnamed.
+
+
+```r
+attr(m_contrasts$coefficients, "names") &lt;- c("Intercept", "Phys Sci vs. Others", "")
+m_contrasts
+```
+
+```
+## 
+## Call:
+## lm(formula = vocab ~ instruct, data = l3_data, contrasts = list(instruct = mat))
+## 
+## Coefficients:
+##           Intercept  Phys Sci vs. Others                       
+##               33.50                 9.75                 6.01
 ```
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
