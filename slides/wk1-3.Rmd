@@ -380,7 +380,7 @@ class: inverse-red middle
 ## Contrasts
 
 **Isolated vs. Orthogonal Sets**.
-If you are conducting an isolated contrast, or non-orthagonal set, you will need to use a different process for specifying contrasts. Here I demonstrate doing a single contrast. The primary difference is using `ginv()` from the `MASS` package rather than `solve()`.
+If you are conducting an isolated contrast, or non-orthogonal set, you will need to use a different process for specifying contrasts. Here I demonstrate doing a single contrast. The primary difference is using `ginv()` from the `MASS` package rather than `solve()`.
 
 ```{r}
 contrast0 <- c(1, -.5, -.5) 
