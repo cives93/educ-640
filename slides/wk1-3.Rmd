@@ -24,7 +24,6 @@ data <- read.sav(here("data/Lab2_Vocab.sav"), use.value.labels = T)
   + Importing Data
   + Descriptives
   + Plots
-
 * ANOVA
   + One-way ANOVA
   + Pairwise Comparisons
