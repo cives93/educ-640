@@ -396,7 +396,7 @@ mat
 Essentially, R fills in the rest of the matrix. This means that there will be "extra" contrasts in the output that you will need to ignore. Here `instruct1` corresponds to my first and only contrast. `instruct2` can be ignored. 
 ```{r}
 m_contrasts <- lm(vocab ~ instruct, data=l3_data, contrasts = list(instruct = mat))
-m_contrasts
+summary(m_contrasts)
 ```
 ---
 
@@ -404,5 +404,5 @@ If you want to make it easier to refer back to your contrasts, you can rename th
 
 ```{r}
 attr(m_contrasts$coefficients, "names") <- c("Intercept", "Phys Sci vs. Others", "")
-m_contrasts
+summary(m_contrasts)
 ```
