@@ -37,11 +37,22 @@ Here I am creating a new summary data frame. After grouping by `meth` and `inst`
 means &lt;- lb5 %&gt;% 
   group_by(inst, meth) %&gt;% 
   summarise(vocab = mean(vocab))
+```
 
+```
+## `summarise()` has grouped output by 'inst'. You can override using the `.groups` argument.
+```
+
+---
+
+
+```r
 ggplot(means, aes(x = inst, y = vocab, group = meth)) +
   geom_point() +
   geom_line(aes(color = meth))
 ```
+
+![](wk_5_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
 
 ---
 ## Contrasts using `emmeans`
@@ -82,6 +93,18 @@ Next I join the two factors into one with `unite`. `col =` specifies the name of
 ```r
 lb5 &lt;- lb5 %&gt;% 
   unite(col = ivs, meth, inst, sep = "_", remove = FALSE)
+
+head(lb5)
+```
+
+```
+##   idnum vocab       ivs inst meth
+## 1     1    53 comp_phys phys comp
+## 2     2    49 comp_phys phys comp
+## 3     3    47 comp_phys phys comp
+## 4     4    42 comp_phys phys comp
+## 5     5    51 comp_phys phys comp
+## 6     6    34 comp_phys phys comp
 ```
 ---
 
@@ -133,7 +156,7 @@ A2B3 &lt;- c(0, 0, 0, 0, 0, 1)
 
 ## Hypothesis 1
 
-Now we can specify our contrasts. This coding references slides 445-446 in Lab 5. I can run the contrasts so it prints the coding scheme.
+Now we can specify our contrasts (reference slides 445-446 in Lab 5). This runs the contrasts so it prints the coding scheme.
 
 
 ```r
@@ -147,7 +170,7 @@ contrast(emm, method = list(
 ##  contrast                       estimate   SE df t.ratio p.value
 ##  c(1, -0.5, -0.5, -1, 0.5, 0.5)     -5.5 5.27 30 -1.043  0.3052
 ```
-Or rename it to something else.
+Here I name the contrast.
 
 ```r
 contrast(emm, method = list(

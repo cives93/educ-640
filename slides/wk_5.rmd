@@ -30,11 +30,15 @@ lb5 <- read.sav(here("data/Lab5_Vocab.sav"), use.value.labels = T)
 
 Here I am creating a new summary data frame. After grouping by `meth` and `inst`, I just make `vocab` equal to the mean of those groups. This dataframe is another way of getting marginal mean values.
 
-```{r, eval  = F}
+```{r}
 means <- lb5 %>% 
   group_by(inst, meth) %>% 
   summarise(vocab = mean(vocab))
+```
 
+---
+
+```{r}
 ggplot(means, aes(x = inst, y = vocab, group = meth)) +
   geom_point() +
   geom_line(aes(color = meth))
@@ -65,6 +69,7 @@ Next I join the two factors into one with `unite`. `col =` specifies the name of
 lb5 <- lb5 %>% 
   unite(col = ivs, meth, inst, sep = "_", remove = FALSE)
 
+head(lb5)
 ```
 ---
 
@@ -102,7 +107,7 @@ A2B3 <- c(0, 0, 0, 0, 0, 1)
 
 ## Hypothesis 1
 
-Now we can specify our contrasts. This coding references slides 445-446 in Lab 5. I can run the contrasts so it prints the coding scheme.
+Now we can specify our contrasts (reference slides 445-446 in Lab 5). This runs the contrasts so it prints the coding scheme.
 
 ```{r}
 contrast(emm, method = list(
@@ -110,7 +115,7 @@ contrast(emm, method = list(
   (A2B1 - (A2B2 + A2B3)/2)
   ))
 ```
-Or rename it to something else.
+Here I name the contrast.
 ```{r}
 contrast(emm, method = list(
   "Hyp1" = (A1B1 - (A1B2 + A1B3)/2) -
