@@ -1,0 +1,171 @@
+---
+title: "EDUC 640"
+subtitle: "Two-Way Factorial ANOVA"
+author: Chris Ives
+output: 
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+needs(tidyverse, xaringan, rio, here, misty, emmeans)
+lb5 <- read.sav(here("data/Lab5_Vocab.sav"), use.value.labels = T)
+```
+
+# Contents
+
+* Plotting Means
+* Recoding/Reordering Factors
+* Contrasts using `emmeans`
+---
+
+## Plot Marginal Means
+
+Here I am creating a new summary data frame. After grouping by `meth` and `inst`, I just make `vocab` equal to the mean of those groups. This dataframe is another way of getting marginal mean values.
+
+```{r, eval  = F}
+means <- lb5 %>% 
+  group_by(inst, meth) %>% 
+  summarise(vocab = mean(vocab))
+
+ggplot(means, aes(x = inst, y = vocab, group = meth)) +
+  geom_point() +
+  geom_line(aes(color = meth))
+```
+
+---
+## Contrasts using `emmeans`
+
+To do two-factor contrasts we will have to use the `emmeans` package. You might find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
+---
+
+## Recoding Data
+
+We have to start by combining our two factors into one factor with six levels. The level names are a little long for my taste so here I am shortening them. First check the orders of the levels so your names are assigned appropriately.
+``` {r, messages = F}
+levels(lb5$meth)
+levels(lb5$meth) <- c("comp", "stan")
+
+levels(lb5$inst)
+levels(lb5$inst) <- c("phys", "soc", "hist")
+
+```
+---
+
+Next I join the two factors into one with `unite`. `col =` specifies the name of the new column, followed by the columns I am joining. I chose to separate them with "_" and set `remove = FALSE` so I don't delete the old variables.
+
+```{r}
+lb5 <- lb5 %>% 
+  unite(col = ivs, meth, inst, sep = "_", remove = FALSE)
+
+```
+---
+
+Last bit of data prep is order them in a way that will make sense for me when I code out contrasts later. This order reflects what's in Gina's slides.
+
+```{r}
+lb5$ivs <- ordered(lb5$ivs, c("comp_phys", "comp_soc", "comp_hist", "stan_phys", "stan_soc", "stan_hist"))
+
+levels(lb5$ivs)
+```
+
+---
+
+## Emmeans
+Start by specifying your model and then running emmeans on that model. Note that I am using `ivs`, which is our combined two factor variable.
+```{r}
+m1 <- lm(vocab ~ ivs, data = lb5)
+emm <- emmeans(m1, ~ ivs)
+```
+
+---
+
+Then we will check the level order and assign a vectors to each. We have 6 levels so the vector is 6 numbers long. A `1` in the vector means I am saving the mean of that level to my object. So, the mean of "comp_phys" is saved to `A1B1`.
+
+```{r}
+levels(lb5$ivs)
+A1B1 <- c(1, 0, 0, 0, 0, 0)
+A1B2 <- c(0, 1, 0, 0, 0, 0)
+A1B3 <- c(0, 0, 1, 0, 0, 0)
+A2B1 <- c(0, 0, 0, 1, 0, 0)
+A2B2 <- c(0, 0, 0, 0, 1, 0)
+A2B3 <- c(0, 0, 0, 0, 0, 1)
+```
+---
+
+## Hypothesis 1
+
+Now we can specify our contrasts. This coding references slides 445-446 in Lab 5. I can run the contrasts so it prints the coding scheme.
+
+```{r}
+contrast(emm, method = list(
+  (A1B1 - (A1B2 + A1B3)/2) -
+  (A2B1 - (A2B2 + A2B3)/2)
+  ))
+```
+Or rename it to something else.
+```{r}
+contrast(emm, method = list(
+  "Hyp1" = (A1B1 - (A1B2 + A1B3)/2) -
+  (A2B1 - (A2B2 + A2B3)/2)
+))
+```
+---
+# Hypothesis 2
+
+Same process for our second contrast.
+```{r}
+contrast(emm, method = list(
+  (A1B1 - A1B2) - (A2B1 - A2B2)
+  ))
+```
+
+```{r}
+contrast(emm, method = list(
+  "Hyp2" = (A1B1 - A1B2) - (A2B1 - A2B2)
+  ))
+```
+---
+## Combining Contrasts
+
+If I was planning to put them into a markdown document, I'd probably want to write it all out with one command and output. I'm also going to add a 
+```{r}
+contrast(emm, method = list(
+  "Hyp1" = (A1B1 - (A1B2 + A1B3)/2) -
+  (A2B1 - (A2B2 + A2B3)/2),
+  "Hyp2" = (A1B1 - A1B2) - (A2B1 - A2B2)
+))
+
+```
+---
+
+Here's the process using the method I described in the Appendix of Wk1-3 slides.
+
+```{r}
+contrast0 <- c(1, -.5, -.5, -1, .5, .5) 
+mat.temp <- rbind(constant = 1/2, contrast0)
+mat.temp
+mat <- MASS::ginv(mat.temp)
+mat <- mat[ , -1]
+mat
+
+```
+
+---
+
+Remember I only specified one contrast so we only pay attention to the first coefficient (that's not the intercept).
+```{r}
+m_contrasts <- lm(vocab ~ ivs, data=lb5, contrasts = list(ivs = mat))
+m_contrasts
+```
+
+---
+
+
