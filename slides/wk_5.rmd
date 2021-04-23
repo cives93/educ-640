@@ -47,7 +47,7 @@ ggplot(means, aes(x = inst, y = vocab, group = meth)) +
 ---
 ## Contrasts using `emmeans`
 
-To do two-factor contrasts we will have to use the `emmeans` package. You might find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
+To do two-factor contrasts we can use the `emmeans` package. You might find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
 ---
 
 ## Recoding Data
@@ -56,6 +56,7 @@ We have to start by combining our two factors into one factor with six levels. T
 ``` {r, messages = F}
 levels(lb5$meth)
 levels(lb5$meth) <- c("comp", "stan")
+?anova_test
 ```
 
 ```{r}
@@ -169,7 +170,7 @@ mat
 Remember I only specified one contrast so we only pay attention to the first coefficient (that's not the intercept).
 ```{r}
 m_contrasts <- lm(vocab ~ ivs, data=lb5, contrasts = list(ivs = mat))
-m_contrasts
+summary(m_contrasts)
 ```
 
 ---

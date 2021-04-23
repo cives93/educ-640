@@ -57,7 +57,7 @@ ggplot(means, aes(x = inst, y = vocab, group = meth)) +
 ---
 ## Contrasts using `emmeans`
 
-To do two-factor contrasts we will have to use the `emmeans` package. You might find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
+To do two-factor contrasts we can use the `emmeans` package. You might find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
 ---
 
 ## Recoding Data
@@ -74,6 +74,12 @@ levels(lb5$meth)
 
 ```r
 levels(lb5$meth) &lt;- c("comp", "stan")
+?anova_test
+```
+
+```
+## No documentation for 'anova_test' in specified packages and libraries:
+## you could try '??anova_test'
 ```
 
 
@@ -264,7 +270,7 @@ Remember I only specified one contrast so we only pay attention to the first coe
 
 ```r
 m_contrasts &lt;- lm(vocab ~ ivs, data=lb5, contrasts = list(ivs = mat))
-m_contrasts
+summary(m_contrasts)
 ```
 
 ```
@@ -272,9 +278,24 @@ m_contrasts
 ## Call:
 ## lm(formula = vocab ~ ivs, data = lb5, contrasts = list(ivs = mat))
 ## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -16.00  -3.25  -0.50   4.00  15.00 
+## 
 ## Coefficients:
-## (Intercept)         ivs1         ivs2         ivs3         ivs4         ivs5  
-##      33.500       -5.500       -1.019       -6.219      -24.620       -5.620
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   33.500      1.243  26.956   &lt;2e-16 ***
+## ivs1          -5.500      5.273  -1.043   0.3052    
+## ivs2          -1.019      3.044  -0.335   0.7401    
+## ivs3          -6.219      3.044  -2.043   0.0499 *  
+## ivs4         -24.620      3.044  -8.088    5e-09 ***
+## ivs5          -5.620      3.044  -1.846   0.0748 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.457 on 30 degrees of freedom
+## Multiple R-squared:  0.7121,	Adjusted R-squared:  0.6641 
+## F-statistic: 14.84 on 5 and 30 DF,  p-value: 2.382e-07
 ```
 
 ---
