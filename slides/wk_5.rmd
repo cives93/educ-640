@@ -15,13 +15,10 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-needs(tidyverse, xaringan, rio, here, misty, emmeans)
+needs(tidyverse, xaringan, rio, here, misty, emmeans, rstatix)
 lb5 <- read.sav(here("data/Lab5_Vocab.sav"), use.value.labels = T)
 ```
 
-# Don't use these slides until end of day Friday (unless you are curious). These methods work but there is a more straightforward way. This will be updated to reflect.
-
----
 # Contents
 
 * Plotting Means
@@ -50,9 +47,87 @@ ggplot(means, aes(x = inst, y = vocab, group = meth)) +
 ---
 ## Contrasts using `emmeans`
 
-To do two-factor contrasts we can use the `emmeans` package. You might find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
+To do two-factor contrasts we can use the `emmeans` package. You will probably find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
 ---
 
+
+## Two Factor Groupings
+
+First we run our model specification using `lm`. Then we run `emmeans` on that object to calculate the marginal means. There are multiple ways to use `emmeans` if you plan to run follow-up pairwise comparisons. This first way will run comparisons within the `by` grouping.
+```{r}
+model <- lm(vocab ~ meth + inst + meth:inst, lb5)
+means_1 <- emmeans(model, "inst", by = "meth")
+means_1
+```
+---
+```{r}
+pairs(means_1)
+```
+---
+
+This way doesn't "nest" one factor in the other and will calculate all possible comparisons.
+
+```{r}
+means_2 <- emmeans(model, ~inst*meth)
+means_2
+```
+---
+
+```{r, eval = F}
+pairs(means_2)
+
+```
+
+```{r, echo = F}
+pairs <- as.data.frame(pairs(means_2))
+rmarkdown::paged_table(
+  pairs, options = list(rownames.print = F)
+)
+```
+
+---
+
+## Specifying contrasts
+
+We'll be using the listing structure from the second method. We just have to specify our contrasts into a list.
+```{r}
+means_2
+```
+
+```{r}
+contrasts <- list(
+  hyp1 = c(1, -.5, -.5, -1, .5, .5),
+  hyp2 = c(1, -1, 0, -1, 1, 0)
+)
+```
+
+---
+
+Much easier!!
+
+```{r}
+contrast(means_2, contrasts, adjust = "holm")
+```
+
+---
+
+## Effect Sizes
+
+If you want partial eta effect sizes (like SPSS output), you'll need to calculate them from the contrast output using the function below.
+
+```{r}
+effectsize::t_to_eta2(
+  t = c(-1.043, -2.628),
+  df_error = 30
+)
+```
+
+---
+
+# Appendix
+All of the following slides reflect less efficient ways of doing contrasts. I am just leaving them in if you want to see some examples of renaming levels and uniting variables.
+
+---
 ## Recoding Data
 
 We have to start by combining our two factors into one factor with six levels. The level names are a little long for my taste so here I am shortening them. First check the orders of the levels so your names are assigned appropriately.
@@ -160,7 +235,7 @@ Here's the process using the method I described in the Appendix of Wk1-3 slides.
 
 ```{r}
 contrast0 <- c(1, -.5, -.5, -1, .5, .5) 
-mat.temp <- rbind(constant = 1/2, contrast0)
+mat.temp <- rbind(constant = 1/6, contrast0)
 mat.temp
 mat <- MASS::ginv(mat.temp)
 mat <- mat[ , -1]

@@ -6,6 +6,8 @@
     <meta name="author" content="Chris Ives" />
     <script src="libs/header-attrs-2.7/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+    <script src="libs/pagedtable-1.1/js/pagedtable.js"></script>
     <link rel="stylesheet" href="new.css" type="text/css" />
   </head>
   <body>
@@ -21,9 +23,6 @@ class: center, middle, inverse, title-slide
 
 
 
-# Don't use these slides until end of day Friday (unless you are curious). These methods work but there is a more straightforward way. This will be updated to reflect.
-
----
 # Contents
 
 * Plotting Means
@@ -60,9 +59,164 @@ ggplot(means, aes(x = inst, y = vocab, group = meth)) +
 ---
 ## Contrasts using `emmeans`
 
-To do two-factor contrasts we can use the `emmeans` package. You might find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
+To do two-factor contrasts we can use the `emmeans` package. You will probably find this easier than the previous approaches where I had you specify your coding in a matrix. Whether you prefer this for one-way contrasts will be up to you.
 ---
 
+
+## Two Factor Groupings
+
+First we run our model specification using `lm`. Then we run `emmeans` on that object to calculate the marginal means. There are multiple ways to use `emmeans` if you plan to run follow-up pairwise comparisons. This first way will run comparisons within the `by` grouping.
+
+```r
+model &lt;- lm(vocab ~ meth + inst + meth:inst, lb5)
+means_1 &lt;- emmeans(model, "inst", by = "meth")
+means_1
+```
+
+```
+## meth = computer:
+##  inst             emmean   SE df lower.CL upper.CL
+##  physical science     46 3.04 30    39.78     52.2
+##  social science       40 3.04 30    33.78     46.2
+##  history              38 3.04 30    31.78     44.2
+## 
+## meth = standard:
+##  inst             emmean   SE df lower.CL upper.CL
+##  physical science     34 3.04 30    27.78     40.2
+##  social science       12 3.04 30     5.78     18.2
+##  history              31 3.04 30    24.78     37.2
+## 
+## Confidence level used: 0.95
+```
+---
+
+```r
+pairs(means_1)
+```
+
+```
+## meth = computer:
+##  contrast                          estimate   SE df t.ratio p.value
+##  physical science - social science        6 4.31 30  1.394  0.3568 
+##  physical science - history               8 4.31 30  1.858  0.1684 
+##  social science - history                 2 4.31 30  0.465  0.8883 
+## 
+## meth = standard:
+##  contrast                          estimate   SE df t.ratio p.value
+##  physical science - social science       22 4.31 30  5.110  &lt;.0001 
+##  physical science - history               3 4.31 30  0.697  0.7671 
+##  social science - history               -19 4.31 30 -4.413  0.0003 
+## 
+## P value adjustment: tukey method for comparing a family of 3 estimates
+```
+---
+
+This way doesn't "nest" one factor in the other and will calculate all possible comparisons.
+
+
+```r
+means_2 &lt;- emmeans(model, ~inst*meth)
+means_2
+```
+
+```
+##  inst             meth     emmean   SE df lower.CL upper.CL
+##  physical science computer     46 3.04 30    39.78     52.2
+##  social science   computer     40 3.04 30    33.78     46.2
+##  history          computer     38 3.04 30    31.78     44.2
+##  physical science standard     34 3.04 30    27.78     40.2
+##  social science   standard     12 3.04 30     5.78     18.2
+##  history          standard     31 3.04 30    24.78     37.2
+## 
+## Confidence level used: 0.95
+```
+---
+
+
+```r
+pairs(means_2)
+```
+
+&lt;div data-pagedtable="false"&gt;
+  &lt;script data-pagedtable-source type="application/json"&gt;
+{"columns":[{"label":["contrast"],"name":[1],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["t.ratio"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"physical science computer - social science computer","2":"6","3":"4.305036","4":"30","5":"1.3937166","6":"7.303314e-01"},{"1":"physical science computer - history computer","2":"8","3":"4.305036","4":"30","5":"1.8582888","6":"4.459890e-01"},{"1":"physical science computer - physical science standard","2":"12","3":"4.305036","4":"30","5":"2.7874333","6":"8.736898e-02"},{"1":"physical science computer - social science standard","2":"34","3":"4.305036","4":"30","5":"7.8977276","6":"1.173408e-07"},{"1":"physical science computer - history standard","2":"15","3":"4.305036","4":"30","5":"3.4842916","6":"1.747009e-02"},{"1":"social science computer - history computer","2":"2","3":"4.305036","4":"30","5":"0.4645722","6":"9.970248e-01"},{"1":"social science computer - physical science standard","2":"6","3":"4.305036","4":"30","5":"1.3937166","6":"7.303314e-01"},{"1":"social science computer - social science standard","2":"28","3":"4.305036","4":"30","5":"6.5040109","6":"4.835728e-06"},{"1":"social science computer - history standard","2":"9","3":"4.305036","4":"30","5":"2.0905749","6":"3.189838e-01"},{"1":"history computer - physical science standard","2":"4","3":"4.305036","4":"30","5":"0.9291444","6":"9.357513e-01"},{"1":"history computer - social science standard","2":"26","3":"4.305036","4":"30","5":"6.0394387","6":"1.735277e-05"},{"1":"history computer - history standard","2":"7","3":"4.305036","4":"30","5":"1.6260027","6":"5.885943e-01"},{"1":"physical science standard - social science standard","2":"22","3":"4.305036","4":"30","5":"5.1102943","6":"2.285914e-04"},{"1":"physical science standard - history standard","2":"3","3":"4.305036","4":"30","5":"0.6968583","6":"9.808926e-01"},{"1":"social science standard - history standard","2":"-19","3":"4.305036","4":"30","5":"-4.4134360","6":"1.549601e-03"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  &lt;/script&gt;
+&lt;/div&gt;
+
+---
+
+## Specifying contrasts
+
+We'll be using the listing structure from the second method. We just have to specify our contrasts into a list.
+
+```r
+means_2
+```
+
+```
+##  inst             meth     emmean   SE df lower.CL upper.CL
+##  physical science computer     46 3.04 30    39.78     52.2
+##  social science   computer     40 3.04 30    33.78     46.2
+##  history          computer     38 3.04 30    31.78     44.2
+##  physical science standard     34 3.04 30    27.78     40.2
+##  social science   standard     12 3.04 30     5.78     18.2
+##  history          standard     31 3.04 30    24.78     37.2
+## 
+## Confidence level used: 0.95
+```
+
+
+```r
+contrasts &lt;- list(
+  hyp1 = c(1, -.5, -.5, -1, .5, .5),
+  hyp2 = c(1, -1, 0, -1, 1, 0)
+)
+```
+
+---
+
+Much easier!!
+
+
+```r
+contrast(means_2, contrasts, adjust = "holm")
+```
+
+```
+##  contrast estimate   SE df t.ratio p.value
+##  hyp1         -5.5 5.27 30 -1.043  0.3052 
+##  hyp2        -16.0 6.09 30 -2.628  0.0268 
+## 
+## P value adjustment: holm method for 2 tests
+```
+
+---
+
+## Effect Sizes
+
+If you want partial eta effect sizes (like SPSS output), you'll need to calculate them from the contrast output using the function below.
+
+
+```r
+effectsize::t_to_eta2(
+  t = c(-1.043, -2.628),
+  df_error = 30
+)
+```
+
+```
+## Eta2 (partial) |       90% CI
+## -----------------------------
+## 0.03           | [0.00, 0.19]
+## 0.19           | [0.02, 0.39]
+```
+
+---
+
+# Appendix
+All of the following slides reflect less efficient ways of doing contrasts. I am just leaving them in if you want to see some examples of renaming levels and uniting variables.
+
+---
 ## Recoding Data
 
 We have to start by combining our two factors into one factor with six levels. The level names are a little long for my taste so here I am shortening them. First check the orders of the levels so your names are assigned appropriately.
@@ -242,14 +396,14 @@ Here's the process using the method I described in the Appendix of Wk1-3 slides.
 
 ```r
 contrast0 &lt;- c(1, -.5, -.5, -1, .5, .5) 
-mat.temp &lt;- rbind(constant = 1/2, contrast0)
+mat.temp &lt;- rbind(constant = 1/6, contrast0)
 mat.temp
 ```
 
 ```
-##           [,1] [,2] [,3] [,4] [,5] [,6]
-## constant   0.5  0.5  0.5  0.5  0.5  0.5
-## contrast0  1.0 -0.5 -0.5 -1.0  0.5  0.5
+##                [,1]       [,2]       [,3]       [,4]      [,5]      [,6]
+## constant  0.1666667  0.1666667  0.1666667  0.1666667 0.1666667 0.1666667
+## contrast0 1.0000000 -0.5000000 -0.5000000 -1.0000000 0.5000000 0.5000000
 ```
 
 ```r

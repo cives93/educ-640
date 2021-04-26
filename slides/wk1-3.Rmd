@@ -384,7 +384,7 @@ If you are conducting an isolated contrast, or non-orthogonal set, you will need
 
 ```{r}
 contrast0 <- c(1, -.5, -.5) 
-mat.temp <- rbind(constant = 1/2, contrast0)
+mat.temp <- rbind(constant = 1/3, contrast0)
 mat.temp
 mat <- MASS::ginv(mat.temp)
 mat <- mat[ , -1]
