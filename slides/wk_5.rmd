@@ -69,6 +69,8 @@ This way doesn't "nest" one factor in the other and will calculate all possible 
 
 ```{r}
 means_2 <- emmeans(model, ~inst*meth)
+
+
 means_2
 ```
 ---
@@ -124,6 +126,33 @@ effectsize::t_to_eta2(
 
 ---
 
+How would you do this for a One-way ANOVA? I'll demonstrate the process from the beginning.
+
+```{r}
+m1 <- lm(vocab ~ inst, lb5)
+
+means <- emmeans(m1, ~ inst)
+means
+
+```
+
+---
+## Specify contrast
+```{r}
+contrasts <- list(
+  hyp1 = c(1, -.5, -.5)
+  )
+
+contrast(means, contrasts)
+```
+Calculate partial eta effect size using previous p.value from previous output.
+```{r}
+effectsize::t_to_eta2(
+  t = c(0.0257),
+  df_error = 33
+)
+```
+---
 # Appendix
 All of the following slides reflect less efficient ways of doing contrasts. I am just leaving them in if you want to see some examples of renaming levels and uniting variables.
 
