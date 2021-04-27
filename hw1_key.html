@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>hw1_key</title>
+
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="highlight-custom.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">EDLD 640 R Support</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="schedule.html">Slides</a>
+</li>
+<li>
+  <a href="https://github.com/cives93/educ-640">Github</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">hw1_key</h1>
+
+</div>
+
+
+<div id="descriptives" class="section level1">
+<h1>Descriptives</h1>
+<pre class="r"><code>describe(hw)</code></pre>
+<pre><code>##             vars  n   mean     sd  median trimmed    mad    min     max  range
+## Condition*     1 20    2.5   1.15    2.50    2.50   1.48   1.00    4.00    3.0
+## ReadingTime    2 20 1032.2 307.44 1085.92 1026.23 330.37 551.34 1588.64 1037.3
+##             skew kurtosis    se
+## Condition*  0.00    -1.52  0.26
+## ReadingTime 0.02    -1.18 68.75</code></pre>
+<pre class="r"><code>describeBy(hw, group = hw$Condition, mat = T)</code></pre>
+<pre><code>##              item  group1 vars n     mean       sd  median  trimmed      mad
+## Condition*1     1  200 lx    1 5    1.000   0.0000    1.00    1.000   0.0000
+## Condition*2     2  500 lx    1 5    2.000   0.0000    2.00    2.000   0.0000
+## Condition*3     3 1000 lx    1 5    3.000   0.0000    3.00    3.000   0.0000
+## Condition*4     4 1500 lx    1 5    4.000   0.0000    4.00    4.000   0.0000
+## ReadingTime1    5  200 lx    2 5 1250.188 297.5312 1203.72 1250.188 441.1328
+## ReadingTime2    6  500 lx    2 5 1096.594 258.7198 1079.31 1096.594 313.1696
+## ReadingTime3    7 1000 lx    2 5  914.006 298.1410  860.09  914.006 335.1121
+## ReadingTime4    8 1500 lx    2 5  868.010 298.1114  894.61  868.010 461.9485
+##                 min     max  range        skew  kurtosis       se
+## Condition*1    1.00    1.00   0.00         NaN       NaN   0.0000
+## Condition*2    2.00    2.00   0.00         NaN       NaN   0.0000
+## Condition*3    3.00    3.00   0.00         NaN       NaN   0.0000
+## Condition*4    4.00    4.00   0.00         NaN       NaN   0.0000
+## ReadingTime1 862.69 1588.64 725.95 -0.05659134 -1.973234 133.0600
+## ReadingTime2 741.65 1395.44 653.79 -0.14425109 -1.862845 115.7030
+## ReadingTime3 634.06 1308.35 674.29  0.21555948 -2.042828 133.3327
+## ReadingTime4 551.34 1218.54 667.20 -0.00372255 -2.131657 133.3195</code></pre>
+<pre class="r"><code>ggplot(hw, aes(x = ReadingTime)) +
+  geom_histogram()</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="hw1_key_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(hw, aes(x = Condition, y = ReadingTime)) +
+  geom_boxplot()</code></pre>
+<p><img src="hw1_key_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>levene_test(hw, ReadingTime ~ Condition, center = &quot;mean&quot;)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##     df1   df2 statistic     p
+##   &lt;int&gt; &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;
+## 1     3    16     0.132 0.939</code></pre>
+</div>
+<div id="anova" class="section level1">
+<h1>ANOVA</h1>
+<pre class="r"><code>needs(powerAnalysis)
+anova &lt;- anova_test(data = hw, formula =  ReadingTime ~ Condition,
+           effect.size = &quot;pes&quot;, detailed = TRUE, type = 3)
+anova
+m1 &lt;- hw %&gt;%  
+  group_by(Condition) %&gt;%  
+  summarise_at(vars(ReadingTime),
+               list(name = mean)) %&gt;% 
+  select(name)
+m1
+power.anova.test(groups = 4, n = 20, between.var = bg, within.var = wg, sig.level = .05)
+
+needs(pingouin)
+
+
+effectsize::cohens_f(anova)
+
+cohens_f(car::Anova(ReadingTime ~ Condition, hw))
+cohens_f(car::Anova(fit, type = 3))
+
+
+
+etasq &lt;- 462967.7/(21308716.2+1332877+462967.7) 
+f = EtaSQ / (1-EtaSQ)
+
+pwr.f2.test(u = 4, v = 16, f = f, sig.level = .05)
+
+pwr.anova.test(k = 4, n = 5, f = f, sig.level = .05)
+
+
+
+fit &lt;- lm(ReadingTime ~ Condition, hw)
+
+anova(fit)
+wg&lt;- anova(fit)[&quot;Residuals&quot;, &quot;Mean Sq&quot;]
+bg &lt;-  anova(fit)[&quot;Condition&quot;, &quot;Mean Sq&quot;]
+bg</code></pre>
+<pre class="r"><code>m1 &lt;- lm(ReadingTime ~ Condition, hw)
+
+means &lt;- emmeans(m1, ~ Condition)
+means
+
+contrasts &lt;- list(
+  hyp1 = c(1, -.33, -.33, -.34),
+  hyp2 = c(1, -1, 0, 0),
+  hyp3 = c(0, 1, -1, 0),
+  hyp4 = c(0, 0, 1, -1)
+)
+
+contrast(means, contrasts, adjust = &quot;bonferroni&quot;)
+
+effectsize::t_to_eta2(
+  t = c(0.0681),
+  df_error = 16
+)</code></pre>
+</div>
+
+<p>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
+<img alt="Creative Commons License" style="border-width:0" src="by-nc.png" width="65"/></a>
+<link rel="stylesheet" href="website-custom.css" type="text/css" />
+</p>
+<script src="highlight-custom.js"></script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

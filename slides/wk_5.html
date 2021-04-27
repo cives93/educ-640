@@ -221,7 +221,7 @@ How would you do this for a One-way ANOVA? I'll demonstrate the process from the
 ```r
 m1 &lt;- lm(vocab ~ inst, lb5)
 
-means &lt;- emmeans(m1, ~ inst)
+means &lt;- emmeans(m1, ~inst)
 means
 ```
 
@@ -239,7 +239,8 @@ means
 
 ```r
 contrasts &lt;- list(
-  hyp1 = c(1, -.5, -.5)
+  hyp1 = c(1, -.5, -.5),
+  hyp2 = c(1, 0, -1)
   )
 
 contrast(means, contrasts)
@@ -247,13 +248,14 @@ contrast(means, contrasts)
 
 ```
 ##  contrast estimate   SE df t.ratio p.value
-##  hyp1         9.75 4.17 33 2.336   0.0257
+##  hyp1         9.75 4.17 33 2.336   0.0257 
+##  hyp2         5.50 4.82 33 1.141   0.2620
 ```
-Calculate partial eta effect size using previous p.value from previous output.
+Calculate partial eta effect size using previous **t-value** from previous output.
 
 ```r
 effectsize::t_to_eta2(
-  t = c(0.0257),
+  t = c(2.336),
   df_error = 33
 )
 ```
@@ -261,7 +263,7 @@ effectsize::t_to_eta2(
 ```
 ## Eta2 (partial) |       90% CI
 ## -----------------------------
-## 2.00e-05       | [0.00, 0.00]
+## 0.14           | [0.01, 0.33]
 ```
 ---
 # Appendix

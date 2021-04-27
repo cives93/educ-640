@@ -131,7 +131,7 @@ How would you do this for a One-way ANOVA? I'll demonstrate the process from the
 ```{r}
 m1 <- lm(vocab ~ inst, lb5)
 
-means <- emmeans(m1, ~ inst)
+means <- emmeans(m1, ~inst)
 means
 
 ```
@@ -140,17 +140,19 @@ means
 ## Specify contrast
 ```{r}
 contrasts <- list(
-  hyp1 = c(1, -.5, -.5)
+  hyp1 = c(1, -.5, -.5),
+  hyp2 = c(1, 0, -1)
   )
 
 contrast(means, contrasts)
 ```
-Calculate partial eta effect size using previous p.value from previous output.
+Calculate partial eta effect size using previous **t-value** from previous output.
 ```{r}
 effectsize::t_to_eta2(
-  t = c(0.0257),
+  t = c(2.336),
   df_error = 33
 )
+
 ```
 ---
 # Appendix
