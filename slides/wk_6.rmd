@@ -1,0 +1,111 @@
+---
+title: "EDUC 640"
+subtitle: "Within Subjects ANOVA"
+author: Chris Ives
+output: 
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+needs(tidyverse, xaringan, rio, here, misty, emmeans, rstatix)
+lb6 <- read.sav(here("data/Lab6_Vocab.sav"), use.value.labels = T)
+```
+
+# Contents
+
+* Restructuring Data
+* Within-Subjects ANOVA
+* Pairwise Comparisons
+* Appendix
+    + Contrasts
+---
+
+## Restructuring Data
+
+We need to restructure the data into a "long" format for ANOVA in R. I start by renaming the variables and then use `pivot_longer` to pivot those variables into two columns. The names of the columns become `inst` and the values become `vocab`.
+
+```{r}
+lb6 <- lb6 %>% 
+  rename(phys = vocab1,
+         social = vocab2,
+         hist = vocab3) %>% 
+  pivot_longer(cols = c(phys, social, hist), values_to = "vocab", names_to = "inst")
+```
+---
+
+Then we can just make a normal boxplot.
+```{r}
+
+ggplot(lb6, aes(x = inst, y = vocab)) +
+  geom_boxplot()
+```
+
+---
+## Within Subjects ANOVA
+`aov_car` will allow us to run `emmeans` on the object and uses the same method for pairwise comparisons as SPSS. We just need to specify our ID variable and our IVs within `Error()`. Mauchly's test is automatically included in the output.
+```{r}
+needs(afex)
+m1 <- afex::aov_car(vocab ~ inst + Error(idnum/inst),
+                           data=lb6, include_aov = F)
+
+```
+
+---
+```{r}
+summary(m1)
+```
+
+---
+
+Don't worry about within-subjects contrasts. We can ignore it and don't have to worry about it. Gina says so :)
+
+However, a brief demonstration is included in the Appendix.
+
+---
+
+## Pairwise Comparisons
+Pairwise comparsions are similar to how we did contrasts last week. We run `emmeans` on our model using our formula (`~inst`) and then run pairs on that object.
+
+```{r}
+em <- emmeans(m1, ~inst)
+pairs(em)
+```
+---
+
+`pairs` does not automatically generate confidence intervals. If you needed them, you can wrap it with `confint` or run it on your pairs object.
+
+```{r}
+confint(pairs(em))
+
+
+```
+---
+class: inverse-blue middle
+# Appendix
+---
+
+## Contrasts
+
+Contrasts require just a different step to our pairwise comparions. We just create our contrasts in a list and run `contrast` on our emmeans object. If it was a 2-way Within-Subjects ANOVA, we would have to run it on our pairs object.
+
+```{r}
+contrasts <- list(
+  hyp1 = c(-.5, 1, -.5),
+  hyp2 = c(0, 1, -1)
+)
+
+```
+
+---
+
+```{r}
+contrast(em, contrasts)
+```

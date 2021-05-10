@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>EDUC 640</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Chris Ives" />
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# EDUC 640
+## Within Subjects ANOVA
+### Chris Ives
+
+---
+
+
+
+
+# Contents
+
+* Restructuring Data
+* Within-Subjects ANOVA
+* Pairwise Comparisons
+* Appendix
+    + Contrasts
+---
+
+## Restructuring Data
+
+We need to restructure the data into a "long" format for ANOVA in R. I start by renaming the variables and then use `pivot_longer` to pivot those variables into two columns. The names of the columns become `inst` and the values become `vocab`.
+
+
+```r
+lb6 &lt;- lb6 %&gt;% 
+  rename(phys = vocab1,
+         social = vocab2,
+         hist = vocab3) %&gt;% 
+  pivot_longer(cols = c(phys, social, hist), values_to = "vocab", names_to = "inst")
+```
+---
+
+Then we can just make a normal boxplot.
+
+```r
+ggplot(lb6, aes(x = inst, y = vocab)) +
+  geom_boxplot()
+```
+
+![](wk_6_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+## Within Subjects ANOVA
+`aov_car` will allow us to run `emmeans` on the object and uses the same method for pairwise comparisons as SPSS. We just need to specify our ID variable and our IVs within `Error()`. Mauchly's test is automatically included in the output.
+
+```r
+needs(afex)
+m1 &lt;- afex::aov_car(vocab ~ inst + Error(idnum/inst),
+                           data=lb6, include_aov = F)
+```
+
+---
+
+```r
+summary(m1)
+```
+
+```
+## 
+## Univariate Type III Repeated-Measures ANOVA Assuming Sphericity
+## 
+##             Sum Sq num Df Error SS den Df F value    Pr(&gt;F)    
+## (Intercept)  40401      1   3531.7     11 125.836 2.319e-07 ***
+## inst          1194      2   1067.3     22  12.305  0.000259 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## 
+## Mauchly Tests for Sphericity
+## 
+##      Test statistic  p-value
+## inst        0.41524 0.012345
+## 
+## 
+## Greenhouse-Geisser and Huynh-Feldt Corrections
+##  for Departure from Sphericity
+## 
+##       GG eps Pr(&gt;F[GG])   
+## inst 0.63101    0.00225 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+##         HF eps Pr(&gt;F[HF])
+## inst 0.6748954 0.00173583
+```
+
+---
+
+Don't worry about within-subjects contrasts. We can ignore it and don't have to worry about it. Gina says so :)
+
+However, a brief demonstration is included in the Appendix.
+
+---
+
+## Pairwise Comparisons
+Pairwise comparsions are similar to how we did contrasts last week. We run `emmeans` on our model using our formula (`~inst`) and then run pairs on that object.
+
+
+```r
+em &lt;- emmeans(m1, ~inst)
+```
+
+```
+## Substituting multivariate/lm model, as aov object missing.
+```
+
+```r
+pairs(em)
+```
+
+```
+##  contrast      estimate   SE df t.ratio p.value
+##  phys - social     14.0 3.01 11  4.651  0.0019 
+##  phys - hist        5.5 1.52 11  3.618  0.0104 
+##  social - hist     -8.5 3.59 11 -2.368  0.0875 
+## 
+## P value adjustment: tukey method for comparing a family of 3 estimates
+```
+---
+
+`pairs` does not automatically generate confidence intervals. If you needed them, you can wrap it with `confint` or run it on your pairs object.
+
+
+```r
+confint(pairs(em))
+```
+
+```
+##  contrast      estimate   SE df lower.CL upper.CL
+##  phys - social     14.0 3.01 11     5.87    22.13
+##  phys - hist        5.5 1.52 11     1.39     9.61
+##  social - hist     -8.5 3.59 11   -18.20     1.20
+## 
+## Confidence level used: 0.95 
+## Conf-level adjustment: tukey method for comparing a family of 3 estimates
+```
+---
+class: inverse-blue middle
+# Appendix
+---
+
+## Contrasts
+
+Contrasts require just a different step to our pairwise comparions. We just create our contrasts in a list and run `contrast` on our emmeans object. If it was a 2-way Within-Subjects ANOVA, we would have to run it on our pairs object.
+
+
+```r
+contrasts &lt;- list(
+  hyp1 = c(-.5, 1, -.5),
+  hyp2 = c(0, 1, -1)
+)
+```
+
+---
+
+
+```r
+contrast(em, contrasts)
+```
+
+```
+##  contrast estimate   SE df t.ratio p.value
+##  hyp1        -11.2 3.22 11 -3.489  0.0051 
+##  hyp2         -8.5 3.59 11 -2.368  0.0373
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

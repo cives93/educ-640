@@ -16,7 +16,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 needs(tidyverse, xaringan, rio, here, knitr, kableExtra, misty, psych, rmarkdown)
-data <- read.sav(here("data/Lab4_Vocab.sav"), use.value.labels = T)
+data <- read.sav(here("data/Lab4_Vocab.sav"), use.value.labels = T) 
 ```
 
 # Contents
