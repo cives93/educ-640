@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>EDUC 640</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Chris Ives" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# EDUC 640
+## Two-Way Within Subjects ANOVA
+### Chris Ives
+
+---
+
+
+
+
+# Contents
+
+* Restructuring Data
+* Two-Way Within-Subjects ANOVA
+* Pairwise Comparisons
+* Contrasts
+---
+
+## Restructuring Data (Review)
+
+We need to restructure the data into a "long" format for ANOVA in R. I start by renaming the variables and then use `pivot_longer` to pivot those variables into two columns. The names of the columns become `condition` and the values become `total`.
+
+
+```r
+lb7 &lt;- lb7 %&gt;%
+  rename(mem_30 = A1B1,
+         mem_60 = A1B2,
+         mem_180 = A1B3,
+         mne_30 = A2B1,
+         mne_60 = A2B2,
+         mne_180= A2B3) %&gt;%
+  pivot_longer(cols = c(mem_30, mem_60, mem_180, mne_30, mne_60, mne_180), values_to = "total", names_to = "condition")
+```
+---
+## Added Step
+To split our factor into its two groupings, we need to use the `separate` function. I am specifiying that condition be separated into `condition` and `study_time`, which can be differentiated by `_`. 
+
+
+```r
+lb7 &lt;- lb7 %&gt;% 
+  separate(condition, into = c("condition", "study_time"), sep = "_")
+lb7
+```
+
+```
+## # A tibble: 48 x 4
+##       ID condition study_time total
+##    &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;
+##  1     1 mem       30             7
+##  2     1 mem       60             7
+##  3     1 mem       180            8
+##  4     1 mne       30            16
+##  5     1 mne       60            16
+##  6     1 mne       180           24
+##  7     2 mem       30             3
+##  8     2 mem       60            11
+##  9     2 mem       180           14
+## 10     2 mne       30             7
+## # … with 38 more rows
+```
+
+---
+Then we can just make a normal boxplot.
+
+```r
+ggplot(lb7, aes(x = study_time, y = total, fill = condition)) +
+  geom_boxplot()
+```
+
+![](wk_7_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+## Two-way Within Subjects ANOVA
+This is a combination of last weeks code with our between-subjects two-way code. We just specify our factors, interaction, and make sure to specify both in `(Error(ID/...))`.
+
+```r
+needs(afex)
+m1 &lt;- afex::aov_car(total ~ condition + study_time + condition:study_time + Error(ID/condition*study_time),
+                           data=lb7, include_aov = F)
+```
+
+---
+
+
+```r
+summary(m1)
+```
+
+```
+## 
+## Univariate Type III Repeated-Measures ANOVA Assuming Sphericity
+## 
+##                      Sum Sq num Df Error SS den Df F value    Pr(&gt;F)    
+## (Intercept)            6912      1   52.000      7 930.462 1.050e-08 ***
+## condition               432      1   75.333      7  40.142 0.0003905 ***
+## study_time              672      2  161.000     14  29.217 1.008e-05 ***
+## condition:study_time    224      2   91.667     14  17.105 0.0001741 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## 
+## Mauchly Tests for Sphericity
+## 
+##                      Test statistic  p-value
+## study_time                  0.23876 0.013612
+## condition:study_time        0.37730 0.053709
+## 
+## 
+## Greenhouse-Geisser and Huynh-Feldt Corrections
+##  for Departure from Sphericity
+## 
+##                       GG eps Pr(&gt;F[GG])    
+## study_time           0.56778  0.0005333 ***
+## condition:study_time 0.61626  0.0020461 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+##                        HF eps   Pr(&gt;F[HF])
+## study_time           0.604025 0.0003809442
+## condition:study_time 0.681413 0.0013411407
+```
+
+---
+## Plot Marginal Means
+
+Here I am creating a new summary data frame. After grouping by `condition` and `study_time`, I just make `total` equal to the mean of those groups. I am also reordering `study_time` so it renders in ascending order for the plot.
+
+
+```r
+means &lt;- lb7 %&gt;% 
+  group_by(condition, study_time) %&gt;% 
+  summarise(total = mean(total)) %&gt;% 
+  mutate(study_time = factor(study_time, c("30", "60", "180")))
+```
+
+```
+## `summarise()` has grouped output by 'condition'. You can override using the `.groups` argument.
+```
+
+---
+
+
+```r
+ggplot(means, aes(x = study_time, y = total, group = condition)) +
+  geom_point() +
+  geom_line(aes(color = condition))
+```
+
+![](wk_7_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(means, aes(x = condition, y = total, group = study_time)) +
+  geom_point() +
+  geom_line(aes(color = study_time))
+```
+
+![](wk_7_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+---
+
+## Pairwise Comparisons
+Pairwise comparsions are similar to how we did contrasts the last few weeks. We run `emmeans` on our model using our formula (`~condition*study_time`) and then run pairs on that object.
+
+
+```r
+em &lt;- emmeans(m1, ~condition*study_time)
+```
+
+```
+## Substituting multivariate/lm model, as aov object missing.
+```
+
+```r
+pairs(em)
+```
+
+```
+##  contrast            estimate    SE df t.ratio p.value
+##  mem X30 - mne X30         -4 0.866  7  -4.619 0.0191 
+##  mem X30 - mem X60         -4 0.845  7  -4.733 0.0168 
+##  mem X30 - mne X60         -6 0.567  7 -10.583 0.0001 
+##  mem X30 - mem X180        -5 1.086  7  -4.606 0.0194 
+##  mem X30 - mne X180       -17 2.196  7  -7.742 0.0010 
+##  mne X30 - mem X60          0 1.488  7   0.000 1.0000 
+##  mne X30 - mne X60         -2 0.535  7  -3.742 0.0530 
+##  mne X30 - mem X180        -1 1.581  7  -0.632 0.9844 
+##  mne X30 - mne X180       -13 2.435  7  -5.339 0.0088 
+##  mem X60 - mne X60         -2 1.225  7  -1.633 0.6052 
+##  mem X60 - mem X180        -1 0.378  7  -2.646 0.2024 
+##  mem X60 - mne X180       -13 1.991  7  -6.529 0.0027 
+##  mne X60 - mem X180         1 1.350  7   0.741 0.9696 
+##  mne X60 - mne X180       -11 2.299  7  -4.785 0.0159 
+##  mem X180 - mne X180      -12 1.927  7  -6.226 0.0036 
+## 
+## P value adjustment: tukey method for comparing a family of 6 estimates
+```
+
+---
+
+Again, `pairs` does not automatically generate confidence intervals. If you needed them, you can wrap it with `confint` or run it on your pairs object.
+
+
+```r
+confint(pairs(em))
+```
+
+```
+##  contrast            estimate    SE df lower.CL upper.CL
+##  mem X30 - mne X30         -4 0.866  7    -7.28  -0.7182
+##  mem X30 - mem X60         -4 0.845  7    -7.20  -0.7973
+##  mem X30 - mne X60         -6 0.567  7    -8.15  -3.8516
+##  mem X30 - mem X180        -5 1.086  7    -9.11  -0.8861
+##  mem X30 - mne X180       -17 2.196  7   -25.32  -8.6792
+##  mne X30 - mem X60          0 1.488  7    -5.64   5.6389
+##  mne X30 - mne X60         -2 0.535  7    -4.03   0.0255
+##  mne X30 - mem X180        -1 1.581  7    -6.99   4.9916
+##  mne X30 - mne X180       -13 2.435  7   -22.23  -3.7732
+##  mem X60 - mne X60         -2 1.225  7    -6.64   2.6411
+##  mem X60 - mem X180        -1 0.378  7    -2.43   0.4323
+##  mem X60 - mne X180       -13 1.991  7   -20.54  -5.4550
+##  mne X60 - mem X180         1 1.350  7    -4.11   6.1142
+##  mne X60 - mne X180       -11 2.299  7   -19.71  -2.2878
+##  mem X180 - mne X180      -12 1.927  7   -19.30  -4.6968
+## 
+## Confidence level used: 0.95 
+## Conf-level adjustment: tukey method for comparing a family of 6 estimates
+```
+---
+## Alternative Pairwise Rendering
+
+Remember, if you want to view pairwise comparisons in a different (more organized) format, you can use the following alternative specification.
+
+
+```r
+means_v2 &lt;- emmeans(m1, "study_time", by = "condition")
+```
+
+```
+## Substituting multivariate/lm model, as aov object missing.
+```
+
+```r
+pairs(means_v2)
+```
+
+```
+## condition = mem:
+##  contrast   estimate    SE df t.ratio p.value
+##  X30 - X60        -4 0.845  7 -4.733  0.0052 
+##  X30 - X180       -5 1.086  7 -4.606  0.0061 
+##  X60 - X180       -1 0.378  7 -2.646  0.0754 
+## 
+## condition = mne:
+##  contrast   estimate    SE df t.ratio p.value
+##  X30 - X60        -2 0.535  7 -3.742  0.0174 
+##  X30 - X180      -13 2.435  7 -5.339  0.0027 
+##  X60 - X180      -11 2.299  7 -4.785  0.0049 
+## 
+## P value adjustment: tukey method for comparing a family of 3 estimates
+```
+
+---
+
+```r
+means_v3 &lt;- emmeans(m1, "condition", by = "study_time")
+```
+
+```
+## Substituting multivariate/lm model, as aov object missing.
+```
+
+```r
+pairs(means_v3)
+```
+
+```
+## study_time = X30:
+##  contrast  estimate    SE df t.ratio p.value
+##  mem - mne       -4 0.866  7 -4.619  0.0024 
+## 
+## study_time = X60:
+##  contrast  estimate    SE df t.ratio p.value
+##  mem - mne       -2 1.225  7 -1.633  0.1465 
+## 
+## study_time = X180:
+##  contrast  estimate    SE df t.ratio p.value
+##  mem - mne      -12 1.927  7 -6.226  0.0004
+```
+---
+
+## Contrasts
+Contrasts should be pretty straightfoward and similar to previous weeks. Start by inspecting the order of your factors so you correctly specify the coding.
+
+
+```r
+em
+```
+
+```
+##  condition study_time emmean    SE df lower.CL upper.CL
+##  mem       X30             6 0.535  7     4.74     7.26
+##  mne       X30            10 1.000  7     7.64    12.36
+##  mem       X60            10 0.500  7     8.82    11.18
+##  mne       X60            12 0.779  7    10.16    13.84
+##  mem       X180           11 0.627  7     9.52    12.48
+##  mne       X180           23 2.062  7    18.13    27.87
+## 
+## Confidence level used: 0.95
+```
+
+
+```r
+contrasts &lt;- list(
+  hyp1 = c(0, 1, -1, 0, -1 , 1)
+)
+```
+
+---
+
+
+```r
+contrast(em, contrasts)
+```
+
+```
+##  contrast estimate   SE df t.ratio p.value
+##  hyp1           12 2.51  7 4.773   0.0020
+```
+
+
+```r
+effectsize::t_to_eta2(
+  t = 4.773,
+  df_error = 7
+)
+```
+
+```
+## Eta2 (partial) |       90% CI
+## -----------------------------
+## 0.76           | [0.37, 0.88]
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

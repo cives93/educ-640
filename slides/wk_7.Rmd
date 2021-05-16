@@ -1,0 +1,170 @@
+---
+title: "EDUC 640"
+subtitle: "Two-Way Within Subjects ANOVA"
+author: Chris Ives
+output: 
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+needs(tidyverse, xaringan, rio, here, misty, emmeans, rstatix, effectsize)
+lb7 <- read.sav(here("data/Lab7_Rutherford.sav"), use.value.labels = T)
+```
+
+# Contents
+
+* Restructuring Data
+* Two-Way Within-Subjects ANOVA
+* Pairwise Comparisons
+* Contrasts
+---
+
+## Restructuring Data (Review)
+
+We need to restructure the data into a "long" format for ANOVA in R. I start by renaming the variables and then use `pivot_longer` to pivot those variables into two columns. The names of the columns become `condition` and the values become `total`.
+
+```{r}
+lb7 <- lb7 %>%
+  rename(mem_30 = A1B1,
+         mem_60 = A1B2,
+         mem_180 = A1B3,
+         mne_30 = A2B1,
+         mne_60 = A2B2,
+         mne_180= A2B3) %>%
+  pivot_longer(cols = c(mem_30, mem_60, mem_180, mne_30, mne_60, mne_180), values_to = "total", names_to = "condition")
+```
+---
+## Added Step
+To split our factor into its two groupings, we need to use the `separate` function. I am specifiying that condition be separated into `condition` and `study_time`, which can be differentiated by `_`. 
+
+```{r}
+lb7 <- lb7 %>% 
+  separate(condition, into = c("condition", "study_time"), sep = "_")
+lb7
+
+```
+
+---
+Then we can just make a normal boxplot.
+```{r}
+ggplot(lb7, aes(x = study_time, y = total, fill = condition)) +
+  geom_boxplot()
+```
+
+---
+## Two-way Within Subjects ANOVA
+This is a combination of last weeks code with our between-subjects two-way code. We just specify our factors, interaction, and make sure to specify both in `(Error(ID/...))`.
+```{r}
+needs(afex)
+m1 <- afex::aov_car(total ~ condition + study_time + condition:study_time + Error(ID/condition*study_time),
+                           data=lb7, include_aov = F)
+```
+
+---
+
+```{r}
+summary(m1)
+```
+
+---
+## Plot Marginal Means
+
+Here I am creating a new summary data frame. After grouping by `condition` and `study_time`, I just make `total` equal to the mean of those groups. I am also reordering `study_time` so it renders in ascending order for the plot.
+
+```{r}
+
+means <- lb7 %>% 
+  group_by(condition, study_time) %>% 
+  summarise(total = mean(total)) %>% 
+  mutate(study_time = factor(study_time, c("30", "60", "180")))
+         
+```
+
+---
+
+```{r}
+ggplot(means, aes(x = study_time, y = total, group = condition)) +
+  geom_point() +
+  geom_line(aes(color = condition))
+```
+
+---
+
+```{r}
+ggplot(means, aes(x = condition, y = total, group = study_time)) +
+  geom_point() +
+  geom_line(aes(color = study_time))
+
+```
+
+---
+
+## Pairwise Comparisons
+Pairwise comparsions are similar to how we did contrasts the last few weeks. We run `emmeans` on our model using our formula (`~condition*study_time`) and then run pairs on that object.
+
+```{r}
+em <- emmeans(m1, ~condition*study_time)
+pairs(em)
+```
+
+---
+
+Again, `pairs` does not automatically generate confidence intervals. If you needed them, you can wrap it with `confint` or run it on your pairs object.
+
+```{r}
+confint(pairs(em))
+```
+---
+## Alternative Pairwise Rendering
+
+Remember, if you want to view pairwise comparisons in a different (more organized) format, you can use the following alternative specification.
+
+```{r}
+
+means_v2 <- emmeans(m1, "study_time", by = "condition")
+pairs(means_v2)
+```
+
+---
+```{r}
+means_v3 <- emmeans(m1, "condition", by = "study_time")
+pairs(means_v3)
+
+```
+---
+
+## Contrasts
+Contrasts should be pretty straightfoward and similar to previous weeks. Start by inspecting the order of your factors so you correctly specify the coding.
+
+```{r}
+em
+```
+
+```{r}
+contrasts <- list(
+  hyp1 = c(0, 1, -1, 0, -1 , 1)
+)
+
+```
+
+---
+
+```{r}
+contrast(em, contrasts)
+```
+
+```{r}
+effectsize::t_to_eta2(
+  t = 4.773,
+  df_error = 7
+)
+
+```
