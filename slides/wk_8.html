@@ -55,7 +55,7 @@ ggplot(lb8, aes(x = time_condition, y = total, fill = order)) +
 
 ---
 ## Two-way Mixed ANOVA
-Since we now have both between and within variables, we have to remember to only put the within variable in our  `(Error(ID/...))`.
+Since we now have both between and within variables, we have to remember to only put the within-subjects variable (time_condition only) in our  `(Error(ID/...))`.
 
 ```r
 needs(afex)
