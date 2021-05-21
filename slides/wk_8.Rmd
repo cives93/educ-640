@@ -1,0 +1,144 @@
+---
+title: "EDUC 640"
+subtitle: "Two-Way Mixed ANOVA"
+author: Chris Ives
+output: 
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+needs(tidyverse, xaringan, rio, here, misty, emmeans, rstatix, effectsize)
+lb8 <- read.sav(here("data/Lab8_Rutherford.sav"), use.value.labels = T)
+```
+
+# Contents
+
+* Restructuring Data
+* Two-Way Mixed ANOVA
+* Simple Effects
+* Custom Contrasts
+---
+
+## Restructuring Data (Review)
+
+Let's pivot the data into a long format and clean up the names. `janitor::clean_names()` by default changes everything to lowercase and snakecase (spaces are _).
+
+```{r}
+lb8 <- lb8 %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(cols = c(thirty, sixty, one_eighty), values_to = "total", names_to = "time_condition") %>% 
+  mutate(order = case_when(order == "Increasing time" ~ "increasing",
+                           order == "Decreasing time" ~ "decreasing"))
+```
+---
+
+## Plots
+
+```{r}
+ggplot(lb8, aes(x = time_condition, y = total, fill = order)) +
+  geom_boxplot()
+```
+
+---
+## Two-way Mixed ANOVA
+Since we now have both between and within variables, we have to remember to only put the within variable in our  `(Error(ID/...))`.
+```{r}
+needs(afex)
+m1 <- afex::aov_car(total ~ time_condition + order + time_condition:order + Error(id/time_condition),
+                           data=lb8, include_aov = F)
+```
+
+---
+
+```{r}
+summary(m1)
+```
+
+---
+## Simple Effects
+
+Our first set of simple effects will be examining `order` by `time_condition`
+
+```{r}
+em <- emmeans(m1, "order", by = "time_condition")
+pairs(em)
+```
+
+---
+
+## Second Set of Simple Effects
+
+Next we will compare `time_condition` by `order`.
+
+```{r}
+
+means_v2 <- emmeans(m1, "time_condition", by = "order")
+pairs(means_v2)
+```
+
+---
+
+## Profile Plots (Review)
+
+```{r}
+
+means <- lb8 %>% 
+  group_by(order, time_condition) %>% 
+  summarise(total = mean(total)) %>% 
+  mutate(time_condition = factor(time_condition, c("thirty", "sixty", "one_eighty")),
+         order = factor(order, c("increasing", "decreasing")))
+         
+```
+
+---
+
+```{r}
+ggplot(means, aes(x = time_condition, y = total, group = order)) +
+  geom_point() +
+  geom_line(aes(color = order))
+```
+---
+
+```{r}
+ggplot(means, aes(x = order, y = total, group = time_condition)) +
+  geom_point() +
+  geom_line(aes(color = time_condition))
+```
+
+---
+
+## Contrasts
+In the previous slides we used `emmeans` to do structured comparisons. However, for our contrasts we want to run them this way so we have all the factorial combinations in a list.
+
+```{r}
+means <- emmeans(m1, ~time_condition*order)
+means
+```
+
+---
+
+Our contrasts are similar to last week. To compare 30 vs 180, we code them for the decreasing condition and code them inversely for the increasing condition (anything that was negative is now positive and vice versa).
+```{r}
+means
+contrasts <- list(
+  thirty_vs_oneeighty = c(1, 0, -1, -1, 0, 1),
+  sixty_vs_oneeighty = c(0, 1, -1, 0, -1, 1)
+)
+
+```
+
+---
+
+Note: The sign for the coefficients is different from SPSS. SPSS output would say 30 is 8 less (negative) than 180. R here is saying 180 is 8 more (positive) than 30 (our reference).
+
+```{r}
+contrast(means, contrasts)
+```
