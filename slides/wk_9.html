@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>EDUC 640</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Chris Ives" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="new.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# EDUC 640
+## Three-Way ANOVA
+### Chris Ives
+
+---
+
+
+
+
+# Contents
+
+* Expanding Boxplots
+* Three-Way ANOVA
+* Using afex
+---
+
+## Exploring the Design
+
+Here we can use the `table` function to create three-way crosstabs.
+
+
+```r
+table(lb9$Size, lb9$Area, lb9$Temp)
+```
+
+```
+## , ,  = 75F
+## 
+##         
+##          Southern OR Central OR
+##   Large           20         20
+##   Medium          20         20
+## 
+## , ,  = 40F
+## 
+##         
+##          Southern OR Central OR
+##   Large           20         20
+##   Medium          20         20
+```
+---
+
+## Plots
+
+To create boxplots across three IVs, we will assign `Area` to the x-axis and facet Temp and Size using `facet_grid`.
+
+
+```r
+plot &lt;- ggplot(lb9, aes(x = Area, y = Flavor)) +
+  geom_boxplot() +
+  facet_grid(rows = vars(Temp), cols = vars(Size))
+```
+---
+![](wk_9_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+## Levene's Test
+
+
+```r
+car::leveneTest(Flavor ~ Area*Temp*Size, data = lb9, center = "mean")
+```
+
+```
+## Levene's Test for Homogeneity of Variance (center = "mean")
+##        Df F value Pr(&gt;F)
+## group   7  0.5181 0.8199
+##       152
+```
+
+---
+## Three-Way Anova
+Since we don't have any within-subjects effects, we can go back to using `rstatix::anova_test`. Writing `Area*Temp*Size` is a short hand for writing out all main effects and interactions.
+
+```r
+m_aov &lt;- anova_test(Flavor ~ Area*Temp*Size, 
+                    data = lb9, 
+                    effect.size = "pes", 
+                    type = 3, 
+                    detailed = T)
+```
+
+```
+## Coefficient covariances computed by hccm()
+```
+
+---
+
+
+```r
+m_aov
+```
+
+```
+## ANOVA Table (type III tests)
+## 
+##           Effect        SSn    SSd DFn DFd         F         p p&lt;.05      pes
+## 1    (Intercept) 1356.06000 11.016   1 152 18711.071 4.85e-161     * 9.92e-01
+## 2           Area    0.52900 11.016   1 152     7.299  8.00e-03     * 4.60e-02
+## 3           Temp    1.08900 11.016   1 152    15.026  1.57e-04     * 9.00e-02
+## 4           Size    0.00025 11.016   1 152     0.003  9.53e-01       2.27e-05
+## 5      Area:Temp    0.02000 11.016   1 152     0.279  5.98e-01       2.00e-03
+## 6      Area:Size    0.04900 11.016   1 152     0.676  4.12e-01       4.00e-03
+## 7      Temp:Size    0.01600 11.016   1 152     0.221  6.39e-01       1.00e-03
+## 8 Area:Temp:Size    0.00025 11.016   1 152     0.003  9.53e-01       2.27e-05
+```
+
+---
+## Estimated Means
+
+To get `emmeans` to work, we need to run it on a `lm` object that is equivalent to our `anova_test`. The process from here is the same as we did in Week 5 if you wanted to do contrasts.
+
+
+```r
+m1 &lt;- lm(Flavor ~ Area*Temp*Size, data=lb9)
+emmeans(m1, ~Area*Temp*Size)
+```
+
+```
+##  Area        Temp Size   emmean     SE  df lower.CL upper.CL
+##  Southern OR 75F  Large    2.93 0.0602 152     2.81     3.05
+##  Central OR  75F  Large    3.04 0.0602 152     2.92     3.15
+##  Southern OR 40F  Large    2.81 0.0602 152     2.69     2.93
+##  Central OR  40F  Large    2.87 0.0602 152     2.75     2.98
+##  Southern OR 75F  Medium   2.92 0.0602 152     2.80     3.04
+##  Central OR  75F  Medium   3.09 0.0602 152     2.97     3.21
+##  Southern OR 40F  Medium   2.75 0.0602 152     2.64     2.87
+##  Central OR  40F  Medium   2.88 0.0602 152     2.77     3.00
+## 
+## Confidence level used: 0.95
+```
+
+---
+## Plotting Means
+
+```r
+means &lt;- lb9 %&gt;% 
+  group_by(Area, Temp, Size) %&gt;% 
+  summarise(Flavor = mean(Flavor))
+```
+
+```
+## `summarise()` has grouped output by 'Area', 'Temp'. You can override using the `.groups` argument.
+```
+
+```r
+means_plot &lt;- ggplot(means, aes(x = Area, y = Flavor, color = Temp)) +
+  geom_point() + 
+  geom_line(aes(group = Temp)) +
+  facet_wrap(~Size)
+```
+
+---
+
+```r
+means_plot
+```
+
+![](wk_9_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+---
+## What about afex?
+
+`afex::aov_car` is what we have used the last few weeks for our within-subjects and mixed ANOVAs. While it is convenient in that it works with `emmeans` it requires an ID variable. I'll demonstrate the process if you wanted to continue using it.
+
+---
+## Adding an ID variable
+Since every case is independent, I can just assign row numbers as the ID.
+
+```r
+lb9 &lt;- lb9 %&gt;% 
+  mutate(id = row_number())
+```
+---
+
+## Running afex
+Notice if we only have between-subjects IVs, we just put the `id` term in `Error()`. The other thing we add is to change the `anova_table` to display partial eta instead of generalized eta.
+
+```r
+m_afex &lt;- afex::aov_car(Flavor ~ Area*Temp*Size + Error(id), 
+                        data = lb9, 
+                        anova_table = list(es = "pes"))
+```
+
+```
+## Contrasts set to contr.sum for the following variables: Area, Temp, Size
+```
+
+```r
+m_afex
+```
+
+```
+## Anova Table (Type 3 tests)
+## 
+## Response: Flavor
+##           Effect     df  MSE         F    pes p.value
+## 1           Area 1, 152 0.07   7.30 **    .05    .008
+## 2           Temp 1, 152 0.07 15.03 ***    .09   .0002
+## 3           Size 1, 152 0.07      0.00 &lt;.0001     .95
+## 4      Area:Temp 1, 152 0.07      0.28   .002     .60
+## 5      Area:Size 1, 152 0.07      0.68   .004     .41
+## 6      Temp:Size 1, 152 0.07      0.22   .001     .64
+## 7 Area:Temp:Size 1, 152 0.07      0.00 &lt;.0001     .95
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1
+```
+
+---
+
+Then you can run `emmeans` directly on your afex object.
+
+```r
+emmeans(m_afex, ~Area*Temp*Size)
+```
+
+```
+##  Area        Temp Size   emmean     SE  df lower.CL upper.CL
+##  Southern OR 75F  Large    2.93 0.0602 152     2.81     3.05
+##  Central OR  75F  Large    3.04 0.0602 152     2.92     3.15
+##  Southern OR 40F  Large    2.81 0.0602 152     2.69     2.93
+##  Central OR  40F  Large    2.87 0.0602 152     2.75     2.98
+##  Southern OR 75F  Medium   2.92 0.0602 152     2.80     3.04
+##  Central OR  75F  Medium   3.09 0.0602 152     2.97     3.21
+##  Southern OR 40F  Medium   2.75 0.0602 152     2.64     2.87
+##  Central OR  40F  Medium   2.88 0.0602 152     2.77     3.00
+## 
+## Confidence level used: 0.95
+```
+
+}
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"navigation": {
+"scroll": false
+},
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

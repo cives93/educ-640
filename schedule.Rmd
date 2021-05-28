@@ -9,4 +9,5 @@ title: "Schedule"
 | 5           | 4/23                |  [Two-Way Factorial ANOVA](slides/wk_5.html)                           |                                                                                                    |
 | 6          | 4/30                 |  [Within-subjects ANOVA (One-way)](slides/wk_6.html)                     |  `anova_car`                                                                                                  |
 | 7          | 5/8                  | [Within-subjects ANOVA (Two-way)](slides/wk_7.html)                   |   
-| 8         | 5/20                 | [Mixed ANOVA (Two-way)](slides/wk_8.html)                              |                                                                                                                                                                         
+| 8         | 5/20                 | [Mixed ANOVA (Two-way)](slides/wk_8.html)                              |       
+| 89        | 5/28               | [Three-way ANOVA](slides/wk_9.html)                              |             

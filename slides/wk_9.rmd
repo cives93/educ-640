@@ -1,0 +1,137 @@
+---
+title: "EDUC 640"
+subtitle: "Three-Way ANOVA"
+author: Chris Ives
+output: 
+  xaringan::moon_reader:
+    css: ["default", "new.css"]
+    lib_dir: libs
+    nature:
+      navigation:
+        scroll: false
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+needs(tidyverse, xaringan, rio, here, misty, emmeans, rstatix, afex)
+lb9 <- read.sav(here("data/Lab9_Potatoes.sav"), use.value.labels = T)
+```
+
+# Contents
+
+* Expanding Boxplots
+* Three-Way ANOVA
+* Using afex
+---
+
+## Exploring the Design
+
+Here we can use the `table` function to create three-way crosstabs.
+
+```{r}
+table(lb9$Size, lb9$Area, lb9$Temp)
+```
+---
+
+## Plots
+
+To create boxplots across three IVs, we will assign `Area` to the x-axis and facet Temp and Size using `facet_grid`.
+
+```{r}
+plot <- ggplot(lb9, aes(x = Area, y = Flavor)) +
+  geom_boxplot() +
+  facet_grid(rows = vars(Temp), cols = vars(Size))
+
+```
+---
+```{r, echo = F}
+plot
+```
+
+---
+## Levene's Test
+
+```{r}
+car::leveneTest(Flavor ~ Area*Temp*Size, data = lb9, center = "mean")
+```
+
+---
+## Three-Way Anova
+Since we don't have any within-subjects effects, we can go back to using `rstatix::anova_test`. Writing `Area*Temp*Size` is a short hand for writing out all main effects and interactions.
+```{r}
+m_aov <- anova_test(Flavor ~ Area*Temp*Size, 
+                    data = lb9, 
+                    effect.size = "pes", 
+                    type = 3, 
+                    detailed = T)
+```
+
+---
+
+```{r}
+m_aov
+```
+
+---
+## Estimated Means
+
+To get `emmeans` to work, we need to run it on a `lm` object that is equivalent to our `anova_test`. The process from here is the same as we did in Week 5 if you wanted to do contrasts.
+
+```{r}
+m1 <- lm(Flavor ~ Area*Temp*Size, data=lb9)
+emmeans(m1, ~Area*Temp*Size)
+```
+
+---
+## Plotting Means
+```{r}
+means <- lb9 %>% 
+  group_by(Area, Temp, Size) %>% 
+  summarise(Flavor = mean(Flavor))
+
+means_plot <- ggplot(means, aes(x = Area, y = Flavor, color = Temp)) +
+  geom_point() + 
+  geom_line(aes(group = Temp)) +
+  facet_wrap(~Size)
+```
+
+---
+```{r}
+means_plot
+```
+
+---
+## What about afex?
+
+`afex::aov_car` is what we have used the last few weeks for our within-subjects and mixed ANOVAs. While it is convenient in that it works with `emmeans` it requires an ID variable. I'll demonstrate the process if you wanted to continue using it.
+
+---
+## Adding an ID variable
+Since every case is independent, I can just assign row numbers as the ID.
+```{r}
+lb9 <- lb9 %>% 
+  mutate(id = row_number())
+
+```
+---
+
+## Running afex
+Notice if we only have between-subjects IVs, we just put the `id` term in `Error()`. The other thing we add is to change the `anova_table` to display partial eta instead of generalized eta.
+```{r}
+m_afex <- afex::aov_car(Flavor ~ Area*Temp*Size + Error(id), 
+                        data = lb9, 
+                        anova_table = list(es = "pes"))
+m_afex
+
+```
+
+---
+
+Then you can run `emmeans` directly on your afex object.
+```{r}
+emmeans(m_afex, ~Area*Temp*Size)
+```
+
+}
