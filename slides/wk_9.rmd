@@ -37,7 +37,7 @@ table(lb9$Size, lb9$Area, lb9$Temp)
 
 ## Plots
 
-To create boxplots across three IVs, we will assign `Area` to the x-axis and facet Temp and Size using `facet_grid`.
+To create boxplots across three IVs, we will assign `Area` to the x-axis and facet `Temp` and `Size` using `facet_grid`. The code is a little more verbose than using `facet_wrap`.
 
 ```{r}
 plot <- ggplot(lb9, aes(x = Area, y = Flavor)) +
@@ -105,7 +105,7 @@ means_plot
 ---
 ## What about afex?
 
-`afex::aov_car` is what we have used the last few weeks for our within-subjects and mixed ANOVAs. While it is convenient in that it works with `emmeans` it requires an ID variable. I'll demonstrate the process if you wanted to continue using it.
+`afex::aov_car` is what we have used the last few weeks for our within-subjects and mixed ANOVAs. While it is convenient in that it works with `emmeans` it requires an ID variable (which we don't have for this dataset). I'll demonstrate the process if you wanted to continue using it.
 
 ---
 ## Adding an ID variable
